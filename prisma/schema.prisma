@@ -135,6 +135,7 @@ model wishlist_item {
 
 enum user_role {
   admin
+  staff
   customer
 }
 

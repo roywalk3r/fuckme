@@ -5,7 +5,7 @@ import { Button } from "./ui/button"
 import { useState, useEffect } from "react"
 import { Input } from "./ui/input"
 import { ModeToggle } from "./theme-toggle"
-import { SignedOut, SignInButton, SignUpButton, SignedIn, UserButton } from "@clerk/nextjs"
+import { SignedOut, SignInButton, SignedIn, UserButton } from "@clerk/nextjs"
 import { LayoutDashboard } from "lucide-react"
 import { useApi } from "@/lib/hooks/use-api"
 

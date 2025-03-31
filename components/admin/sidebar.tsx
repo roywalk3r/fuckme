@@ -2,10 +2,22 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Package, Users, ShoppingCart, Settings, Tag, BarChart, LogOut } from "lucide-react"
+import {
+  LayoutDashboard,
+  Package,
+  Users,
+  ShoppingCart,
+  Settings,
+  Tag,
+  BarChart,
+  LogOut,
+  Database,
+  RefreshCw,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useClerk } from "@clerk/nextjs"
+import { ModeToggle } from "@/components/theme-toggle"
 
 export default function AdminSidebar() {
   const pathname = usePathname()
@@ -22,47 +34,60 @@ export default function AdminSidebar() {
       label: "Products",
       icon: Package,
       href: "/admin/products",
-      active: pathname === "/admin/products",
+      active: pathname.includes("/admin/products"),
     },
     {
       label: "Categories",
       icon: Tag,
       href: "/admin/categories",
-      active: pathname === "/admin/categories",
+      active: pathname.includes("/admin/categories"),
     },
     {
       label: "Orders",
       icon: ShoppingCart,
       href: "/admin/orders",
-      active: pathname === "/admin/orders",
+      active: pathname.includes("/admin/orders"),
     },
     {
       label: "Users",
       icon: Users,
       href: "/admin/users",
-      active: pathname === "/admin/users",
+      active: pathname.includes("/admin/users"),
     },
     {
       label: "Analytics",
       icon: BarChart,
       href: "/admin/analytics",
-      active: pathname === "/admin/analytics",
+      active: pathname.includes("/admin/analytics"),
     },
     {
       label: "Settings",
       icon: Settings,
       href: "/admin/settings",
-      active: pathname === "/admin/settings",
+      active: pathname.includes("/admin/settings"),
+    },
+    {
+      label: "Database Tools",
+      icon: Database,
+      href: "/admin/fix-schema",
+      active: pathname.includes("/admin/fix-schema"),
+    },
+    {
+      label: "Seed Data",
+      icon: RefreshCw,
+      href: "/admin/seed",
+      active: pathname.includes("/admin/seed"),
     },
   ]
 
   return (
     <div className="flex flex-col h-full w-64 border-r bg-muted/40">
-      <div className="p-6">
+      <div className="p-6 flex items-center justify-between">
         <Link href="/admin" className="flex items-center gap-2 font-bold text-xl">
           <Package className="h-6 w-6" />
           <span>Admin Panel</span>
         </Link>
+        <ModeToggle />
       </div>
       <div className="flex-1 px-3 py-2 space-y-1">
         {routes.map((route) => (

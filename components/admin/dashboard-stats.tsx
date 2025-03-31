@@ -24,8 +24,8 @@ export default function AdminDashboardStats() {
     totalOrders: 0,
     totalRevenue: 0,
   }
-console.log("stats",stats);
-console.log("data", data)
+  console.log("stats", stats)
+  console.log("data", data)
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -65,8 +65,8 @@ console.log("data", data)
           <DollarSign className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-        <div className="text-2xl font-bold">${Number(stats?.totalRevenue).toFixed(2)}</div>
-        <p className="text-xs text-muted-foreground">Revenue from all orders</p>
+          <div className="text-2xl font-bold">${Number(stats?.totalRevenue).toFixed(2)}</div>
+          <p className="text-xs text-muted-foreground">Revenue from all orders</p>
         </CardContent>
       </Card>
     </div>

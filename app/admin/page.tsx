@@ -1,13 +1,21 @@
+"use client"
+
+import { useRouter } from "next/navigation"
 import { Suspense } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Plus, ShoppingCart, Users, AlertCircle } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import AdminDashboardStats from "@/components/admin/dashboard-stats"
 import AdminRecentOrders from "@/components/admin/recent-orders"
 import AdminTopProducts from "@/components/admin/top-products"
 import AdminSalesChart from "@/components/admin/sales-chart"
 
 export default function AdminDashboardPage() {
+  const router = useRouter()
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -17,6 +25,68 @@ export default function AdminDashboardPage() {
       <Suspense fallback={<StatsLoading />}>
         <AdminDashboardStats />
       </Suspense>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" onClick={() => router.push("/admin/products/new")}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Product
+              </Button>
+              <Button variant="outline" onClick={() => router.push("/admin/orders")}>
+                <ShoppingCart className="mr-2 h-4 w-4" />
+                View Orders
+              </Button>
+              <Button variant="outline" onClick={() => router.push("/admin/users")}>
+                <Users className="mr-2 h-4 w-4" />
+                Manage Users
+              </Button>
+              <Button variant="outline" onClick={() => router.push("/admin/debug/admin-debug")}>
+                <AlertCircle className="mr-2 h-4 w-4" />
+                Debug Panel
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>System Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span>Database Connection</span>
+                <Badge variant="outline" className="bg-green-50 text-green-700">
+                  Connected
+                </Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Appwrite Storage</span>
+                <Badge variant="outline" className="bg-green-50 text-green-700">
+                  Connected
+                </Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Clerk Authentication</span>
+                <Badge variant="outline" className="bg-green-50 text-green-700">
+                  Connected
+                </Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Admin Access</span>
+                <Badge variant="outline" className="bg-green-50 text-green-700">
+                  Granted
+                </Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>

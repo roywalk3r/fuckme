@@ -12,12 +12,11 @@ export function createApiResponse<T>(response: ApiResponse<T>): NextResponse {
 
   // Convert BigInt to Number before returning the JSON response
   const serializeData = JSON.parse(
-    JSON.stringify(data, (_, value) => (typeof value === "bigint" ? Number(value) : value))
+    JSON.stringify(data, (_, value) => (typeof value === "bigint" ? Number(value) : value)),
   )
 
   return NextResponse.json({ data: serializeData, error: error || null }, { status })
 }
-
 
 export function handleApiError(error: unknown): NextResponse {
   console.error("API Error:", error)

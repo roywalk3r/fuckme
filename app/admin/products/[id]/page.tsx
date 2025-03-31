@@ -27,7 +27,7 @@ const productSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   price: z.coerce.number().positive("Price must be positive"),
   stock: z.coerce.number().int().nonnegative("Stock cannot be negative"),
-  categoryId: z.string().min(1, "Category is required"),
+  category_id: z.string().min(1, "Category is required"),
   images: z.array(z.string().url("Invalid image URL")).min(1, "At least one image is required"),
 })
 
@@ -52,13 +52,13 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   // Update product mutation
   const { mutate: updateProduct, isLoading: isUpdating } = useApiMutation("/api/admin/products", "PATCH", {
     onSuccess: () => {
-      toast.info( "Product updated",{
+      toast.info("Product updated", {
         description: "The product has been updated successfully.",
       })
       router.push("/admin/products")
     },
     onError: (error) => {
-      toast.error("Error",{
+      toast.error("Error", {
         description: error,
       })
     },
@@ -73,7 +73,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       description: "",
       price: 0,
       stock: 0,
-      categoryId: "",
+      category_id: "",
       images: [],
     },
   })
@@ -88,7 +88,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         description: product.description,
         price: product.price,
         stock: product.stock,
-        categoryId: product.categoryId,
+        category_id: product.category_id,
         images: product.images,
       })
       setImageUrls(product.images)
@@ -102,7 +102,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     setImageUrls(updatedImages)
     form.setValue("images", updatedImages)
 
-    toast.info( "Images uploaded",{
+    toast.info("Images uploaded", {
       description: `${results.length} image(s) uploaded successfully.`,
     })
   }
@@ -249,7 +249,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
                   <FormField
                     control={form.control}
-                    name="categoryId"
+                    name="category_id"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Category</FormLabel>

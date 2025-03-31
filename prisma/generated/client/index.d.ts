@@ -75,6 +75,7 @@ export type wishlist_item = $Result.DefaultSelection<Prisma.$wishlist_itemPayloa
 export namespace $Enums {
   export const user_role: {
   admin: 'admin',
+  staff: 'staff',
   customer: 'customer'
 };
 

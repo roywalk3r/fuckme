@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/pagination"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -38,7 +38,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label"
 
 export default function AdminUsersPage() {
-  const { toast } = useToast()
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [editingUser, setEditingUser] = useState<any>(null)
@@ -50,18 +49,15 @@ export default function AdminUsersPage() {
   // Update user mutation
   const { mutate: updateUser, isLoading: isUpdating } = useApiMutation(`/api/admin/users`, "PATCH", {
     onSuccess: () => {
-      toast({
-        title: "User updated",
+      toast.success( "User updated",{
         description: "The user role has been updated successfully.",
       })
       refetch()
       setEditingUser(null)
     },
     onError: (error) => {
-      toast({
-        title: "Error",
+      toast.error( "Error",{
         description: error,
-        variant: "destructive",
       })
     },
   })
@@ -103,9 +99,9 @@ export default function AdminUsersPage() {
     }
   }
 
-  const users = data?.data?.users || []
-  const pagination = data?.data?.pagination || { total: 0, pages: 1 }
-
+  const users = data?.users || []
+  const pagination = data?.pagination || { total: 0, pages: 1 }
+console.log(data)
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -218,7 +214,7 @@ export default function AdminUsersPage() {
                 .filter((p) => p === 1 || p === pagination.pages || (p >= page - 1 && p <= page + 1))
                 .map((p) => (
                   <PaginationItem key={p}>
-                    <PaginationLink isActive={page === p} onClick={() => setPage(p)}>
+                    <PaginationLink isActive={page === p} onClick={() => setPage(p)} size={"sm"}>
                       {p}
                     </PaginationLink>
                   </PaginationItem>

@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { Loader2, Search, ImageIcon, Trash2 } from "lucide-react"
-import { AppwriteImage } from "./appwrite-image"
+import { AppwriteImg } from "./appwrite-img"
 import { listFiles, deleteFile, extractFileIdFromUrl } from "@/lib/appwrite/appwirte-utils"
 
 interface AppwriteMediaBrowserProps {
@@ -161,13 +161,7 @@ export function AppwriteMediaBrowser({
                   }`}
                   onClick={() => handleAssetSelect(asset.url)}
                 >
-                  <AppwriteImage
-                    src={asset.url}
-                    alt={asset.name}
-                    width={200}
-                    height={200}
-                    className="w-full aspect-square object-cover"
-                  />
+                  <AppwriteImg src={asset.url} alt={asset.name} className="w-full aspect-square object-cover" />
 
                   {allowDelete && (
                     <Button

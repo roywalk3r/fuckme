@@ -1,28 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import { Skeleton } from "@/components/ui/skeleton"
 
-interface AppwriteImageProps {
+interface AppwriteImgProps {
   src: string
   alt: string
-  width?: number
-  height?: number
+  width?: number | string
+  height?: number | string
   className?: string
-  priority?: boolean
-  objectFit?: "contain" | "cover" | "fill" | "none" | "scale-down"
 }
 
-export function AppwriteImage({
-  src,
-  alt,
-  width = 500,
-  height = 500,
-  className = "",
-  priority = false,
-  objectFit = "cover",
-}: AppwriteImageProps) {
+export function AppwriteImg({ src, alt, width = "100%", height = "auto", className = "" }: AppwriteImgProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -45,9 +34,6 @@ export function AppwriteImage({
     )
   }
 
-  // Use a placeholder for local development if needed
-  const imageSrc = src.startsWith("/") ? src : src
-
   return (
     <div className="relative" style={{ width, height }}>
       {isLoading && <Skeleton className="absolute inset-0 w-full h-full" />}
@@ -57,17 +43,13 @@ export function AppwriteImage({
           <span className="text-muted-foreground">{error}</span>
         </div>
       ) : (
-        <Image
-          src={imageSrc || "/placeholder.svg"}
+        <img
+          src={src || "/placeholder.svg"}
           alt={alt}
-          width={width}
-          height={height}
           className={className}
-          style={{ objectFit }}
-          priority={priority}
+          style={{ width, height, objectFit: "cover" }}
           onLoad={handleImageLoad}
           onError={handleImageError}
-          unoptimized={src.includes("appwrite")} // Skip optimization for Appwrite images
         />
       )}
     </div>

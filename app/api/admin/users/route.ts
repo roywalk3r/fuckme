@@ -9,7 +9,7 @@ const userUpdateSchema = z.object({
   id: z.string(),
   name: z.string().optional(),
   email: z.string().email().optional(),
-  role: z.enum(["ADMIN", "STAFF", "CUSTOMER"]).optional(),
+  role: z.enum(["admin", "staff", "customer"]).optional(),
 })
 
 export async function GET(req: NextRequest) {
@@ -46,15 +46,15 @@ export async function GET(req: NextRequest) {
 
     // Get users with pagination
     const [users, total] = await Promise.all([
-      prisma.user.findMany({
+      prisma.users.findMany({
         where,
         select: {
           id: true,
           name: true,
           email: true,
           role: true,
-          createdAt: true,
-          updatedAt: true,
+          created_at: true,
+          updated_at: true,
           _count: {
             select: {
               orders: true,
@@ -62,11 +62,11 @@ export async function GET(req: NextRequest) {
             },
           },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { created_at: "desc" },
         skip,
         take: limit,
       }),
-      prisma.user.count({ where }),
+      prisma.users.count({ where }),
     ])
 
     return createApiResponse({
@@ -99,7 +99,7 @@ export async function PATCH(req: NextRequest) {
     const { id, ...data } = userUpdateSchema.parse(body)
 
     // Update user
-    const user = await prisma.user.update({
+    const user = await prisma.users.update({
       where: { id },
       data,
       select: {
@@ -107,8 +107,8 @@ export async function PATCH(req: NextRequest) {
         name: true,
         email: true,
         role: true,
-        createdAt: true,
-        updatedAt: true,
+        created_at: true,
+        updated_at: true,
       },
     })
 
@@ -140,7 +140,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Delete user
-    await prisma.user.delete({
+    await prisma.users.delete({
       where: { id },
     })
 

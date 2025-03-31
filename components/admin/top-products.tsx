@@ -19,8 +19,8 @@ export default function AdminTopProducts() {
     return <ProductsLoading />
   }
 
-  const topProducts = data?.data?.topProducts || []
-
+  const topProducts = data?.topProducts || []
+console.log(topProducts)
   return (
     <div className="space-y-4">
       {topProducts.length === 0 ? (
@@ -36,7 +36,7 @@ export default function AdminTopProducts() {
                 <p className="font-medium leading-none">{item.product?.name || "Unknown Product"}</p>
                 <p className="text-sm text-muted-foreground">{item.totalSold} units sold</p>
               </div>
-              <div className="font-medium">${item.product?.price?.toFixed(2) || "0.00"}</div>
+              <div className="font-medium">${Number(item.product?.price)?.toFixed(2) || "0.00"}</div>
             </div>
           ))}
 

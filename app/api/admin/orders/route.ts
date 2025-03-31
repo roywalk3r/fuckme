@@ -7,8 +7,8 @@ import { z } from "zod"
 // Order update validation schema
 const orderUpdateSchema = z.object({
   id: z.string(),
-  status: z.enum(["PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"]).optional(),
-  paymentStatus: z.enum(["PENDING", "PAID", "FAILED", "REFUNDED"]).optional(),
+  status: z.enum(["processing", "shipped", "deivered", "canceled"]).optional(),
+  paymentStatus: z.enum(["pending", "paid", "failed", "refunded"]).optional(),
 })
 
 export async function GET(req: NextRequest) {
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
               email: true,
             },
           },
-          orderItems: {
+          order_items: {
             include: {
               product: {
                 select: {
@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
           },
           payment: true,
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { created_at: "desc" },
         skip,
         take: limit,
       }),
@@ -113,7 +113,10 @@ export async function PATCH(req: NextRequest) {
     // Update order
     const order = await prisma.order.update({
       where: { id },
-      data,
+      data: {
+        status: data.status,
+        paymentStatus: data.paymentStatus,
+      },
       include: {
         user: {
           select: {
@@ -122,7 +125,7 @@ export async function PATCH(req: NextRequest) {
             email: true,
           },
         },
-        orderItems: {
+        order_items: {
           include: {
             product: {
               select: {

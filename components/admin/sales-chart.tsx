@@ -17,7 +17,7 @@ export default function AdminSalesChart() {
     return <Skeleton className="h-[300px] w-full" />
   }
 
-  const salesByMonth = data?.data?.salesByMonth || []
+  const salesByMonth = data?.salesByMonth || []
 
   // Format data for chart
   const chartData = salesByMonth

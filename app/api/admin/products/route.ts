@@ -1,4 +1,3 @@
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:3997233121.
 import type { NextRequest } from "next/server"
 import prisma from "@/lib/prisma"
 import { createApiResponse, handleApiError } from "@/lib/api-utils"
@@ -12,7 +11,7 @@ const productSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   price: z.number().positive("Price must be positive"),
   stock: z.number().int().nonnegative("Stock cannot be negative"),
-  categoryId: z.string().min(1, "Category is required"),
+  category_id: z.string().min(1, "Category is required"),
   images: z.array(z.string().url("Invalid image URL")).min(1, "At least one image is required"),
 })
 
@@ -48,39 +47,33 @@ export async function GET(req: NextRequest) {
     // Calculate pagination
     const skip = (page - 1) * limit
 
+    console.log("Fetching products with where:", where)
+
     // Get products with pagination
-    const [products, total] = await Promise.all([
-      prisma.product.findMany({
-        where,
-        include: {
-          category: true,
-          _count: {
-            select: {
-              reviews: true,
-              order_items: true,
-            },
+    const products = await prisma.product.findMany({
+      where,
+      include: {
+        category: true,
+        _count: {
+          select: {
+            reviews: true,
+            order_items: true,
           },
         },
-        orderBy: { created_at: "desc" },
-        skip,
-        take: limit,
-      }),
-      prisma.product.count({ where }),
-    ])
+      },
+      orderBy: { created_at: "desc" },
+      skip,
+      take: limit,
+    })
+
+    console.log(`Found ${products.length} products`)
 
     return createApiResponse({
-      data: {
-        products,
-        pagination: {
-          total,
-          pages: Math.ceil(total / limit),
-          page,
-          limit,
-        },
-      },
+      data: products,
       status: 200,
     })
   } catch (error) {
+    console.error("Error fetching products:", error)
     return handleApiError(error)
   }
 }
@@ -100,15 +93,15 @@ export async function POST(req: NextRequest) {
     // Create product
     const product = await prisma.product.create({
       data: {
-     name: validatedData.name,
+        name: validatedData.name,
         description: validatedData.description,
         price: validatedData.price,
         stock: validatedData.stock,
-        category: { connect: { id: validatedData.categoryId } },
-        images: validatedData.images },
+        category: { connect: { id: validatedData.category_id } },
+        images: validatedData.images,
+      },
       include: { category: true },
     })
-
 
     return createApiResponse({
       data: product,
@@ -129,7 +122,7 @@ export async function PATCH(req: NextRequest) {
   try {
     // Parse and validate request body
     const body = await req.json()
-    const { id, ...data } = productSchema.parse(body)
+    const { id, category_id, ...data } = productSchema.parse(body)
 
     if (!id) {
       return createApiResponse({
@@ -138,10 +131,18 @@ export async function PATCH(req: NextRequest) {
       })
     }
 
+    // Build update object
+    const updateData: any = { ...data }
+
+    // If category_id is provided, update the category relation
+    if (category_id) {
+      updateData.category = { connect: { id: category_id } }
+    }
+
     // Update product
     const product = await prisma.product.update({
       where: { id },
-      data,
+      data: updateData,
       include: { category: true },
     })
 
@@ -153,6 +154,7 @@ export async function PATCH(req: NextRequest) {
     return handleApiError(error)
   }
 }
+
 
 export async function DELETE(req: NextRequest) {
   // Check admin authorization

@@ -25,7 +25,7 @@ const productSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   price: z.coerce.number().positive("Price must be positive"),
   stock: z.coerce.number().int().nonnegative("Stock cannot be negative"),
-  categoryId: z.string().min(1, "Category is required"),
+  category_id: z.string().min(1, "Category is required"),
   images: z.array(z.string().url("Invalid image URL")).min(1, "At least one image is required"),
 })
 
@@ -73,13 +73,14 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
       description: initialData?.description || "",
       price: initialData?.price || 0,
       stock: initialData?.stock || 0,
-      categoryId: initialData?.categoryId || "",
+      category_id: initialData?.category_id || "",
       images: initialData?.images || [],
     },
   })
 
   // Handle image upload success
   const handleUploadSuccess = (urls: string[]) => {
+    console.log("Uploaded image URLs:", urls)
     const updatedImages = [...imageUrls, ...urls]
     setImageUrls(updatedImages)
     form.setValue("images", updatedImages)
@@ -105,6 +106,8 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
   const onSubmit = async (data: ProductFormValues) => {
     setIsSubmitting(true)
     try {
+      console.log("Submitting product data:", data)
+
       const endpoint = isEditing ? `/api/admin/products/${initialData?.id}` : "/api/admin/products"
       const method = isEditing ? "PATCH" : "POST"
 
@@ -116,14 +119,20 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
         body: JSON.stringify(data),
       })
 
+      const responseData = await response.json()
+      console.log("API response:", responseData)
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Something went wrong")
+        throw new Error(responseData.error || "Something went wrong")
       }
 
       toast.success(isEditing ? "Product updated successfully" : "Product created successfully")
-      router.push("/admin/products")
-      router.refresh()
+
+      // Add a small delay before navigation to ensure the toast is visible
+      setTimeout(() => {
+        router.push("/admin/products")
+        router.refresh()
+      }, 1000)
     } catch (error) {
       console.error("Error saving product:", error)
       toast.error(error instanceof Error ? error.message : "Failed to save product")
@@ -206,7 +215,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
 
                   <FormField
                     control={form.control}
-                    name="categoryId"
+                    name="category_id"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Category</FormLabel>

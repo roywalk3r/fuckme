@@ -1,9 +1,8 @@
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:2479600482.
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma"
 export default async function Debug() {
-  const users = await prisma.users.findMany({});
-    return (
-<div>
+  const users = await prisma.users.findMany({})
+  return (
+    <div>
       <h1>Users:</h1>
       <ul>
         {users.map((user) => (
@@ -11,11 +10,17 @@ export default async function Debug() {
             <div>
               <strong>ID:</strong> {user.id}
             </div>
-            <div><strong>Name:</strong>{user.name}</div>
-            <div><strong>Email:</strong> {user.email}</div>
+            <div>
+              <strong>Name:</strong>
+              {user.name}
+            </div>
+            <div>
+              <strong>Email:</strong> {user.email}
+            </div>
           </li>
         ))}
       </ul>
-</div>
-  );
+    </div>
+  )
 }
+

@@ -3,36 +3,22 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Search, Filter, MoreHorizontal, Edit, Eye, ArrowUpDown, Package, CreditCard } from "lucide-react"
+import {
+  Search, Filter, MoreHorizontal, Edit, Eye, ArrowUpDown, Package, CreditCard
+} from "lucide-react"
 import { useApi, useApiMutation } from "@/lib/hooks/use-api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
@@ -50,16 +36,14 @@ export default function AdminOrdersPage() {
   // Update order mutation
   const { mutate: updateOrder, isLoading: isUpdating } = useApiMutation(`/api/admin/orders`, "PATCH", {
     onSuccess: () => {
-      toast.info( "Order updated",{
+      toast.success("Order updated", {
         description: "The order status has been updated successfully.",
       })
       refetch()
       setEditingOrder(null)
     },
     onError: (error) => {
-      toast.error( "Error",{
-        description: error,
-      })
+      toast.error("Error", { description: error })
     },
   })
 
@@ -71,52 +55,29 @@ export default function AdminOrdersPage() {
 
   const handleUpdateOrder = () => {
     if (editingOrder) {
-      const updateData: any = { id: editingOrder.id }
-
-      if (status) {
-        updateData.status = status
-      }
-
-      if (paymentStatus) {
-        updateData.paymentStatus = paymentStatus
-      }
-
+      const updateData: any = { id: editingOrder.id, status, payment_status: paymentStatus }
       updateOrder(updateData)
     }
   }
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "PROCESSING":
-        return "secondary"
-      case "SHIPPED":
-        return "default"
-      case "DELIVERED":
-        return "success"
-      case "CANCELLED":
-        return "destructive"
-      default:
-        return "outline"
-    }
-  }
+  const getStatusBadgeVariant = (status: string) => ({
+    PROCESSING: "secondary",
+    SHIPPED: "default",
+    DELIVERED: "success",
+    CANCELLED: "destructive",
+  }[status] || "outline")
 
-  const getPaymentStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "PAID":
-        return "success"
-      case "PENDING":
-        return "warning"
-      case "FAILED":
-        return "destructive"
-      case "REFUNDED":
-        return "secondary"
-      default:
-        return "outline"
-    }
-  }
+  const getPaymentStatusBadgeVariant = (status: string) => ({
+    PAID: "success",
+    PENDING: "outline",
+    FAILED: "destructive",
+    REFUNDED: "secondary",
+  }[status] || "outline")
 
-  const orders = data?.data?.orders || []
-  const pagination = data?.data?.pagination || { total: 0, pages: 1 }
+  const orders = data?.orders || []
+  const pagination = data?.pagination || { total: 0, pages: 1 }
+
+  console.log("🚀 ~ Admin Orders Data:", data)
 
   return (
     <div className="space-y-6">
@@ -126,12 +87,7 @@ export default function AdminOrdersPage() {
 
       <div className="flex items-center justify-between">
         <form onSubmit={handleSearch} className="flex w-full max-w-sm items-center space-x-2">
-          <Input
-            type="search"
-            placeholder="Search orders..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <Input type="search" placeholder="Search orders..." value={search} onChange={(e) => setSearch(e.target.value)} />
           <Button type="submit">
             <Search className="h-4 w-4" />
           </Button>
@@ -144,11 +100,7 @@ export default function AdminOrdersPage() {
 
       {isLoading ? (
         <div className="space-y-2">
-          {Array(5)
-            .fill(0)
-            .map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full" />
-            ))}
+          {Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
         </div>
       ) : (
         <>
@@ -173,29 +125,33 @@ export default function AdminOrdersPage() {
               <TableBody>
                 {orders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
-                      No orders found
-                    </TableCell>
+                    <TableCell colSpan={7} className="text-center py-8">No orders found</TableCell>
                   </TableRow>
                 ) : (
                   orders.map((order: any) => (
                     <TableRow key={order.id}>
                       <TableCell className="font-medium">{order.id.substring(0, 8)}</TableCell>
                       <TableCell>{order.user?.name || order.user?.email || "N/A"}</TableCell>
-                      <TableCell>
+                      <TableCell className="capitalize">
                         <Badge variant={getStatusBadgeVariant(order.status)}>
                           <Package className="h-3 w-3 mr-1" />
                           {order.status}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getPaymentStatusBadgeVariant(order.paymentStatus)}>
+                        <Badge variant={getPaymentStatusBadgeVariant(order.payment_status)}>
                           <CreditCard className="h-3 w-3 mr-1" />
-                          {order.paymentStatus}
+                          {order.payment_status}
                         </Badge>
                       </TableCell>
-                      <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
-                      <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell>${Number(order.total_amount)?.toFixed(2)}</TableCell>
+                      <TableCell>
+                        {new Date(order.created_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "2-digit",
+                        })}
+                      </TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -204,13 +160,11 @@ export default function AdminOrdersPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setEditingOrder(order)
-                                setStatus(order.status)
-                                setPaymentStatus(order.paymentStatus)
-                              }}
-                            >
+                            <DropdownMenuItem onClick={() => {
+                              setEditingOrder(order)
+                              setStatus(order.status)
+                              setPaymentStatus(order.payment_status)
+                            }}>
                               <Edit className="mr-2 h-4 w-4" />
                               Update Status
                             </DropdownMenuItem>
@@ -234,73 +188,20 @@ export default function AdminOrdersPage() {
               <PaginationItem>
                 <PaginationPrevious onClick={() => setPage(page > 1 ? page - 1 : 1)} disabled={page <= 1} />
               </PaginationItem>
-              {Array.from({ length: pagination.pages }, (_, i) => i + 1)
-                .filter((p) => p === 1 || p === pagination.pages || (p >= page - 1 && p <= page + 1))
-                .map((p) => (
-                  <PaginationItem key={p}>
-                    <PaginationLink isActive={page === p} onClick={() => setPage(p)}>
-                      {p}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
+              {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((p) => (
+                <PaginationItem key={p}>
+                  <PaginationLink size="sm" isActive={page === p} onClick={() => setPage(p)}>
+                    {p}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
               <PaginationItem>
-                <PaginationNext
-                  onClick={() => setPage(page < pagination.pages ? page + 1 : pagination.pages)}
-                  disabled={page >= pagination.pages}
-                />
+                <PaginationNext onClick={() => setPage(page < pagination.pages ? page + 1 : pagination.pages)} disabled={page >= pagination.pages} />
               </PaginationItem>
             </PaginationContent>
           </Pagination>
         </>
       )}
-
-      <Dialog open={!!editingOrder} onOpenChange={(open) => !open && setEditingOrder(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Update Order Status</DialogTitle>
-            <DialogDescription>Update the status for order #{editingOrder?.id?.substring(0, 8)}</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="status">Order Status</Label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PROCESSING">Processing</SelectItem>
-                  <SelectItem value="SHIPPED">Shipped</SelectItem>
-                  <SelectItem value="DELIVERED">Delivered</SelectItem>
-                  <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="paymentStatus">Payment Status</Label>
-              <Select value={paymentStatus} onValueChange={setPaymentStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select payment status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PENDING">Pending</SelectItem>
-                  <SelectItem value="PAID">Paid</SelectItem>
-                  <SelectItem value="FAILED">Failed</SelectItem>
-                  <SelectItem value="REFUNDED">Refunded</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingOrder(null)}>
-              Cancel
-            </Button>
-            <Button onClick={handleUpdateOrder} disabled={isUpdating}>
-              {isUpdating ? "Saving..." : "Save Changes"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
-

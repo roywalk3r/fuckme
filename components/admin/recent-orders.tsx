@@ -20,17 +20,17 @@ export default function AdminRecentOrders() {
     return <OrdersLoading />
   }
 
-  const recentOrders = data?.data?.recentOrders || []
-
+  const recentOrders = data?.recentOrders || []
+console.log("🚀 ~ AdminRecentOrders ~ recentOrders:", recentOrders)
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case "PROCESSING":
+      case "processing":
         return "secondary"
-      case "SHIPPED":
-        return "default"
-      case "DELIVERED":
+      case "shiped":
         return "success"
-      case "CANCELLED":
+      case "delivered":
+        return "success"
+      case "cancelled":
         return "destructive"
       default:
         return "outline"
@@ -39,18 +39,20 @@ export default function AdminRecentOrders() {
 
   const getPaymentStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case "PAID":
-        return "success"
-      case "PENDING":
-        return "warning"
-      case "FAILED":
+      case "paid":
+        return "success"  // Now "success" is a valid variant
+      case "pending":
+        return "outline"
+      case "failed":
         return "destructive"
-      case "REFUNDED":
+      case "refunded":
         return "secondary"
       default:
         return "outline"
     }
   }
+  
+  
 
   return (
     <div>
@@ -85,13 +87,13 @@ export default function AdminRecentOrders() {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getPaymentStatusBadgeVariant(order.paymentStatus)}>
+                  <Badge variant={getPaymentStatusBadgeVariant(order.payment_status)}>
                     <CreditCard className="h-3 w-3 mr-1" />
-                    {order.paymentStatus}
+                    {order.payment_status}
                   </Badge>
                 </TableCell>
-                <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
-                <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell>${Number(order.total_amount)?.toFixed(2)}</TableCell>
+                <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
                 <TableCell>
                   <Button variant="ghost" size="sm">
                     <Eye className="h-4 w-4 mr-1" />
@@ -105,7 +107,7 @@ export default function AdminRecentOrders() {
       </Table>
     </div>
   )
-}
+
 
 function OrdersLoading() {
   return (
@@ -117,5 +119,4 @@ function OrdersLoading() {
         ))}
     </div>
   )
-}
-
+}}

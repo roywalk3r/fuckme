@@ -1,180 +1,236 @@
 "use client"
 
+import type React from "react"
+
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Suspense } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Plus, ShoppingCart, Users, AlertCircle } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+import { toast } from "sonner"
+import { Loader2, Plus, Search, Edit, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import AdminDashboardStats from "@/components/admin/dashboard-stats"
-import AdminRecentOrders from "@/components/admin/recent-orders"
-import AdminTopProducts from "@/components/admin/top-products"
-import AdminSalesChart from "@/components/admin/sales-chart"
+import { Input } from "@/components/ui/input"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { AppwriteImg } from "@/components/appwrite/appwrite-img"
+import type { Product } from "@/types/product"
 
-export default function AdminDashboardPage() {
+export default function AdminProductsPage() {
   const router = useRouter()
+  const [products, setProducts] = useState<Product[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch("/api/admin/products")
+        if (!response.ok) {
+          throw new Error("Failed to fetch products")
+        }
+        const data = await response.json()
+
+        // Log the response to help debug
+        console.log("Products API response:", data)
+
+        // Handle the specific structure where products are nested under data.products
+        if (data.data && data.data.products && Array.isArray(data.data.products)) {
+          setProducts(data.data.products)
+        } else if (data.data && Array.isArray(data.data)) {
+          setProducts(data.data)
+        } else {
+          console.error("Unexpected data structure:", data)
+          setProducts([])
+        }
+      } catch (error) {
+        toast.error("Failed to load products")
+        console.error(error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchProducts()
+  }, [])
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+  }
+
+  const confirmDelete = (product: Product) => {
+    setProductToDelete(product)
+  }
+
+  const handleDelete = async () => {
+    if (!productToDelete) return
+
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`/api/admin/products/${productToDelete.id}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to delete product")
+      }
+
+      setProducts(products.filter((p) => p.id !== productToDelete.id))
+      toast.success("Product deleted successfully")
+      setProductToDelete(null)
+    } catch (error) {
+      toast.error("Failed to delete product")
+      console.error(error)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const filteredProducts = Array.isArray(products)
+    ? products.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.description.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    : []
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+    <div className="container py-10">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold">Products</h1>
+        <Button variant={"link"} onClick={() => router.push("/admin/products/new")}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Product
+        </Button>
       </div>
 
-      <Suspense fallback={<StatsLoading />}>
-        <AdminDashboardStats />
-      </Suspense>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" onClick={() => router.push("/admin/products/new")}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Product
-              </Button>
-              <Button variant="outline" onClick={() => router.push("/admin/orders")}>
-                <ShoppingCart className="mr-2 h-4 w-4" />
-                View Orders
-              </Button>
-              <Button variant="outline" onClick={() => router.push("/admin/users")}>
-                <Users className="mr-2 h-4 w-4" />
-                Manage Users
-              </Button>
-              <Button variant="outline" onClick={() => router.push("/admin/debug/admin-debug")}>
-                <AlertCircle className="mr-2 h-4 w-4" />
-                Debug Panel
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>System Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span>Database Connection</span>
-                <Badge variant="outline" className="bg-green-50 text-green-700">
-                  Connected
-                </Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>Appwrite Storage</span>
-                <Badge variant="outline" className="bg-green-50 text-green-700">
-                  Connected
-                </Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>Clerk Authentication</span>
-                <Badge variant="outline" className="bg-green-50 text-green-700">
-                  Connected
-                </Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>Admin Access</span>
-                <Badge variant="outline" className="bg-green-50 text-green-700">
-                  Granted
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="mb-6">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search products..."
+            className="pl-8 w-full md:w-96"
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+        </div>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-        </TabsList>
+      {isLoading ? (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : filteredProducts.length === 0 ? (
+        <div className="text-center py-12 border rounded-lg">
+          <h2 className="text-xl font-semibold">No products found</h2>
+          <p className="text-muted-foreground mt-2">
+            {searchQuery ? "Try a different search term" : "Add your first product to get started"}
+          </p>
+          {searchQuery && (
+            <Button variant="outline" className="mt-4" onClick={() => setSearchQuery("")}>
+              Clear Search
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="border rounded-lg overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[80px]">Image</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Stock</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredProducts?.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell>
+                    <div className="w-12 h-12 rounded-md overflow-hidden">
+                      <AppwriteImg
+                        src={product.images[0] || "/placeholder.svg"}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <p className="font-medium truncate max-w-[200px]">{product.name}</p>
+                      <p className="text-sm text-muted-foreground truncate max-w-[200px]">{product.description}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell>${Number(product.price).toFixed(2)}</TableCell>
+                  <TableCell>{product.stock}</TableCell>
+                  <TableCell>
+                    <Badge variant={product.stock > 0 ? "outline" : "destructive"}>
+                      {product.stock > 0 ? "In Stock" : "Out of Stock"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          console.log(`Navigating to edit product: ${product.id}`)
+                          router.push(`/admin/products/${product.id}/edit`)
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit</span>
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => confirmDelete(product)}>
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
-              <CardHeader>
-                <CardTitle>Sales Overview</CardTitle>
-              </CardHeader>
-              <CardContent className="pl-2">
-                <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
-                  <AdminSalesChart />
-                </Suspense>
-              </CardContent>
-            </Card>
-
-            <Card className="col-span-3">
-              <CardHeader>
-                <CardTitle>Top Selling Products</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
-                  <AdminTopProducts />
-                </Suspense>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Orders</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Suspense fallback={<Skeleton className="h-[400px] w-full" />}>
-                <AdminRecentOrders />
-              </Suspense>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="analytics" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Analytics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Detailed analytics will be available here.</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="reports" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Reports</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Generate and view reports here.</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
-  )
-}
-
-function StatsLoading() {
-  return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {Array(4)
-        .fill(0)
-        .map((_, i) => (
-          <Card key={i}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <Skeleton className="h-5 w-20" />
-              <Skeleton className="h-4 w-4" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-7 w-24 mb-1" />
-              <Skeleton className="h-4 w-32" />
-            </CardContent>
-          </Card>
-        ))}
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!productToDelete} onOpenChange={(open) => !open && setProductToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Product</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{productToDelete?.name}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setProductToDelete(null)} disabled={isDeleting}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

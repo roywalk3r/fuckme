@@ -41,6 +41,57 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     return handleApiError(error)
   }
 }
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  // Check admin authorization
+  const authResponse = await adminAuthMiddleware(req)
+  if (authResponse.status !== 200) {
+    return authResponse
+  }
+
+  try {
+    const productId = params.id
+    const body = await req.json()
+
+    console.log(`Updating product with ID: ${productId}`)
+    console.log("Update data:", body)
+
+    // Fetch the existing product
+    const existingProduct = await prisma.product.findUnique({
+      where: { id: productId },
+      select: { category_id: true }, // Get current category_id
+    })
+
+    if (!existingProduct) {
+      return createApiResponse({
+        error: "Product not found",
+        status: 404,
+      })
+    }
+
+    // Update product while preserving the existing category_id if none is provided
+    const updatedProduct = await prisma.product.update({
+      where: { id: productId },
+      data: {
+        name: body.name,
+        description: body.description,
+        price: body.price,
+        stock: body.stock,
+        category_id: body.category_id || existingProduct.category_id, // Keep existing category if not changed
+        images: body.images,
+      },
+    })
+
+    console.log(`Product updated successfully:`, updatedProduct)
+
+    return createApiResponse({
+      data: updatedProduct,
+      status: 200,
+    })
+  } catch (error) {
+    console.error(`Error updating product with ID ${params.id}:`, error)
+    return handleApiError(error)
+  }
+}
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   // Check admin authorization

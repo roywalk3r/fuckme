@@ -1,20 +1,8 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  images: {
-    domains: [
-      'cloud.appwrite.io',
-      'localhost',
-      'placeholder.svg'
-    ],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'cloud.appwrite.io',
-        pathname: '**',
-      },
-    ],
-  },
-};
+  /* config options here */
+}
 
-export default nextConfig;
+export default nextConfig
+
