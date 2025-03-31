@@ -12,6 +12,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
   try {
     const productId = params.id
+    console.log(`Fetching product with ID: ${productId}`)
 
     // Get product details
     const product = await prisma.product.findUnique({
@@ -21,7 +22,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       },
     })
 
+    console.log(`Product found:`, product)
+
     if (!product) {
+      console.log(`Product not found with ID: ${productId}`)
       return createApiResponse({
         error: "Product not found",
         status: 404,
@@ -33,6 +37,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       status: 200,
     })
   } catch (error) {
+    console.error(`Error fetching product with ID ${params.id}:`, error)
     return handleApiError(error)
   }
 }

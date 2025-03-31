@@ -261,7 +261,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                             <AppwriteUpload
                               onUploadSuccess={handleUploadSuccess}
                               buttonText="Upload Images"
-                            //   folder="products"
+                              //   folder="products"
                               multiple={true}
                               acceptedFileTypes="image/*"
                             />
@@ -271,7 +271,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                               buttonText="Media Library"
                               maxSelections={10}
                               allowDelete={true}
-                            //   folder="products"
+                              //   folder="products"
                             />
                           </div>
 

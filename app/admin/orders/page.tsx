@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/pagination"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -38,7 +38,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label"
 
 export default function AdminOrdersPage() {
-  const { toast } = useToast()
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [editingOrder, setEditingOrder] = useState<any>(null)
@@ -51,18 +50,15 @@ export default function AdminOrdersPage() {
   // Update order mutation
   const { mutate: updateOrder, isLoading: isUpdating } = useApiMutation(`/api/admin/orders`, "PATCH", {
     onSuccess: () => {
-      toast({
-        title: "Order updated",
+      toast.info( "Order updated",{
         description: "The order status has been updated successfully.",
       })
       refetch()
       setEditingOrder(null)
     },
     onError: (error) => {
-      toast({
-        title: "Error",
+      toast.error( "Error",{
         description: error,
-        variant: "destructive",
       })
     },
   })

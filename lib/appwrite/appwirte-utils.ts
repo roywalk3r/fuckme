@@ -2,18 +2,28 @@ import { ID, Query, type Models } from "appwrite"
 import { storage } from "./appwrite-client"
 import { toast } from "sonner"
 
-// Bucket ID constant
-const BUCKET_ID = process.env.NEXT_PUBLIC_APPWRITE_STORAGE_BUCKET || ""
+// Get bucket ID from environment variable
+const BUCKET_ID = process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID || ""
 
 // Function to upload a file to Appwrite Storage
-export async function uploadFile(file: File): Promise<string> {
+export async function uploadFile(file: File, customBucketId?: string): Promise<{ url: string; fileId: string }> {
   try {
-    if (!BUCKET_ID) {
+    const bucketId = customBucketId || BUCKET_ID
+
+    if (!bucketId) {
       throw new Error("Storage bucket ID is not configured")
     }
 
-    const result = await storage.createFile(BUCKET_ID, ID.unique(), file)
-    return result.$id
+    // Create file in Appwrite Storage
+    const result = await storage.createFile(bucketId, ID.unique(), file)
+
+    // Get file view URL
+    const fileUrl = storage.getFileView(bucketId, result.$id).toString()
+
+    return {
+      url: fileUrl,
+      fileId: result.$id,
+    }
   } catch (error: any) {
     console.error("Error uploading file:", error)
 
@@ -37,14 +47,14 @@ export function getFilePreview(fileId: string, width?: number, height?: number):
   if (!fileId || !BUCKET_ID) return ""
 
   try {
-    let url = storage.getFilePreview(BUCKET_ID, fileId)
+    const url = storage.getFilePreview(BUCKET_ID, fileId)
 
     if (width) {
-        url.searchParams.set("width", width.toString())
+      url.searchParams.set("width", width.toString())
     }
 
     if (height) {
-        url.searchParams.set("height", height.toString())
+      url.searchParams.set("height", height.toString())
     }
 
     return url.toString()
@@ -55,76 +65,41 @@ export function getFilePreview(fileId: string, width?: number, height?: number):
 }
 
 // Function to delete a file
-export async function deleteFile(fileId: string): Promise<boolean> {
+export async function deleteFile(fileId: string, customBucketId?: string): Promise<boolean> {
   try {
-    if (!BUCKET_ID) {
+    const bucketId = customBucketId || BUCKET_ID
+
+    if (!bucketId) {
       throw new Error("Storage bucket ID is not configured")
     }
 
-    await storage.deleteFile(BUCKET_ID, fileId)
+    await storage.deleteFile(bucketId, fileId)
     return true
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error deleting file:", error)
-
-    // Handle specific errors
-    if (error.code === 401) {
-      toast.error("Authentication error: Please log in to delete files")
-    } else if (error.code === 403) {
-      toast.error("Permission denied: You do not have permission to delete this file")
-    } else if (error.code === 404) {
-      toast.error("File not found: The file may have been already deleted")
-      return true // Consider it deleted if it doesn't exist
-    } else {
-      toast.error(`Delete error: ${error.message || "Unknown error"}`)
-    }
-
     return false
   }
 }
 
-// Function to list files with pagination and search
-export async function listFiles(search = "", limit = 10, offset = 0): Promise<{ files: Models.File[]; total: number }> {
+// Function to list files
+export async function listFiles(customBucketId?: string): Promise<{ id: string; name: string; url: string }[]> {
   try {
-    // Make sure BUCKET_ID is not empty
-    if (!BUCKET_ID) {
-      console.error("Bucket ID is not defined")
-      toast.error("Storage configuration error: Bucket ID is missing")
-      return { files: [], total: 0 }
+    const bucketId = customBucketId || BUCKET_ID
+
+    if (!bucketId) {
+      throw new Error("Storage bucket ID is not configured")
     }
 
-    const queries = []
+    const response = await storage.listFiles(bucketId)
 
-    // Add search query if provided
-    if (search) {
-      queries.push(Query.search("name", search))
-    }
-
-    // Add limit and offset
-    queries.push(Query.limit(limit))
-    queries.push(Query.offset(offset))
-
-    const response = await storage.listFiles(BUCKET_ID, queries)
-
-    return {
-      files: response.files,
-      total: response.total,
-    }
-  } catch (error: any) {
+    return response.files.map((file) => ({
+      id: file.$id,
+      name: file.name,
+      url: storage.getFileView(bucketId, file.$id).toString(),
+    }))
+  } catch (error) {
     console.error("Error listing files:", error)
-
-    // Handle specific errors
-    if (error.code === 401) {
-      toast.error("Authentication error: Please log in to view files")
-    } else if (error.code === 403) {
-      toast.error("Permission denied: You do not have permission to view files")
-    } else if (error.message?.includes("CORS")) {
-      toast.error("CORS error: Your application domain is not allowed to access Appwrite")
-    } else {
-      toast.error(`Error loading files: ${error.message || "Unknown error"}`)
-    }
-
-    // Return empty result instead of throwing
-    return { files: [], total: 0 }
+    return []
   }
 }
 

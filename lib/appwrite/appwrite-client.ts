@@ -14,3 +14,4 @@ export const account = new Account(client)
 
 // Export the client for use in other files
 export default client
+

@@ -16,15 +16,24 @@ export default function EditProductPage() {
     const fetchProduct = async () => {
       try {
         setIsLoading(true)
+        console.log(`Fetching product with ID: ${params.id}`)
         const response = await fetch(`/api/admin/products/${params.id}`)
+
         if (!response.ok) {
-          throw new Error("Failed to fetch product")
+          throw new Error(`Failed to fetch product: ${response.status} ${response.statusText}`)
         }
+
         const data = await response.json()
-        setProduct(data.data)
+        console.log("Product data received:", data)
+
+        if (data.data) {
+          setProduct(data.data)
+        } else {
+          throw new Error("Invalid data structure received from API")
+        }
       } catch (error) {
-        toast.error("Failed to load product")
-        console.error(error)
+        console.error("Error fetching product:", error)
+        toast.error(`Failed to load product: ${error instanceof Error ? error.message : "Unknown error"}`)
       } finally {
         setIsLoading(false)
       }

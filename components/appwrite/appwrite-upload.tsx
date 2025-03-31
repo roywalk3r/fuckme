@@ -47,8 +47,6 @@ export function AppwriteUpload({
     setUploadProgress(0)
 
     try {
-      const uploadPromises = Array.from(files).map((file) => uploadFile(file, bucketId))
-
       // Track progress (approximate since we can't easily track multiple uploads)
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
@@ -57,8 +55,8 @@ export function AppwriteUpload({
         })
       }, 300)
 
+      const uploadPromises = Array.from(files).map((file) => uploadFile(file, bucketId))
       const results = await Promise.all(uploadPromises)
-      const urls = results.map((result: { url: any }) => result.url)
 
       clearInterval(progressInterval)
       setUploadProgress(100)
@@ -68,6 +66,8 @@ export function AppwriteUpload({
         fileInputRef.current.value = ""
       }
 
+      // Extract URLs from results
+      const urls = results.map((result) => result.url)
       onUploadSuccess(urls)
 
       toast.success(`${urls.length} file(s) uploaded successfully.`)
