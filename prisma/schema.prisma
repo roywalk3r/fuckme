@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id         String    @id @default(cuid())
+  name       String
+  email      String    @unique
+  role       user_role @default(customer)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  addresses  address[]
+  orders     order[]
+  reviews    review[]
+  wishlist   wishlist?
+}
+
+model product {
+  id             String          @id @default(cuid())
+  name           String
+  description    String
+  price          Decimal
+  stock          Int
+  category_id    String
+  images         String[]
+  created_at     DateTime        @default(now())
+  updated_at     DateTime        @updatedAt
+  order_items    order_item[]
+  category       category        @relation(fields: [category_id], references: [id])
+  reviews        review[]
+  wishlist_items wishlist_item[]
+}
+
+model category {
+  id         String    @id @default(cuid())
+  name       String    @unique
+  slug       String    @unique
+  image      String?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  products   product[]
+}
+
+model order {
+  id             String            @id @default(cuid())
+  user_id        String
+  status         order_status      @default(pending)
+  total_amount   Decimal
+  payment_status payment_status    @default(unpaid)
+  created_at     DateTime          @default(now())
+  updated_at     DateTime          @updatedAt
+  user           users             @relation(fields: [user_id], references: [id])
+  order_items    order_item[]
+  payment        payment?
+  shipping       shipping_address?
+}
+
+model order_item {
+  id         String  @id @default(cuid())
+  order_id   String
+  product_id String
+  quantity   Int
+  price      Decimal
+  order      order   @relation(fields: [order_id], references: [id])
+  product    product @relation(fields: [product_id], references: [id])
+}
+
+model payment {
+  id             String         @id @default(cuid())
+  order_id       String         @unique
+  payment_method payment_method
+  payment_status payment_status @default(unpaid)
+  transaction_id String?
+  created_at     DateTime       @default(now())
+  order          order          @relation(fields: [order_id], references: [id])
+}
+
+model review {
+  id         String   @id @default(cuid())
+  user_id    String
+  product_id String
+  rating     Int
+  comment    String?
+  created_at DateTime @default(now())
+  product    product  @relation(fields: [product_id], references: [id])
+  user       users    @relation(fields: [user_id], references: [id])
+}
+
+model address {
+  id        String @id @default(cuid())
+  user_id   String
+  full_name String
+  street    String
+  city      String
+  state     String
+  zip_code  String
+  country   String
+  phone     String
+  user      users  @relation(fields: [user_id], references: [id])
+}
+
+model shipping_address {
+  id        String @id @default(cuid())
+  order_id  String @unique
+  full_name String
+  street    String
+  city      String
+  state     String
+  zip_code  String
+  country   String
+  phone     String
+  order     order  @relation(fields: [order_id], references: [id])
+}
+
+model wishlist {
+  id      String          @id @default(cuid())
+  user_id String          @unique
+  user    users           @relation(fields: [user_id], references: [id])
+  items   wishlist_item[]
+}
+
+model wishlist_item {
+  id          String   @id @default(cuid())
+  wishlist_id String
+  product_id  String
+  product     product  @relation(fields: [product_id], references: [id])
+  wishlist    wishlist @relation(fields: [wishlist_id], references: [id])
+}
+
+enum user_role {
+  admin
+  customer
+}
+
+enum order_status {
+  pending
+  shipped
+  delivered
+  canceled
+}
+
+enum payment_status {
+  unpaid
+  paid
+  refunded
+}
+
+enum payment_method {
+  stripe
+  paypal
+  bank_transfer
+}
