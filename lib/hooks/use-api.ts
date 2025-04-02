@@ -29,7 +29,17 @@ export function useApi<T>(url: string, options: UseApiOptions = {}) {
 
     try {
       const response = await fetch(url)
-      const result: ApiResponse<T> = await response.json()
+
+      // Check if response has content before parsing
+      const contentType = response.headers.get("content-type")
+      let result: ApiResponse<T> = {}
+
+      if (contentType && contentType.includes("application/json") && response.status !== 204) {
+        const text = await response.text()
+        if (text) {
+          result = JSON.parse(text) as ApiResponse<T>
+        }
+      }
 
       if (!response.ok) {
         const errorMessage =
@@ -37,7 +47,7 @@ export function useApi<T>(url: string, options: UseApiOptions = {}) {
             ? result.error
             : Array.isArray(result.error)
               ? result.error.join(", ")
-              : "An error occurred"
+              : `Request failed with status ${response.status}`
 
         throw new Error(errorMessage)
       }
@@ -46,6 +56,10 @@ export function useApi<T>(url: string, options: UseApiOptions = {}) {
         setData(result.data)
         setIsSuccess(true)
         onSuccess?.(result.data)
+      } else if (response.ok) {
+        // Handle successful but empty responses
+        setIsSuccess(true)
+        onSuccess?.(null)
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred"
@@ -95,7 +109,16 @@ export function useApiMutation<T, U = any>(
         body: payload ? JSON.stringify(payload) : undefined,
       })
 
-      const result: ApiResponse<T> = await response.json()
+      // Check if response has content before parsing
+      const contentType = response.headers.get("content-type")
+      let result: ApiResponse<T> = {}
+
+      if (contentType && contentType.includes("application/json") && response.status !== 204) {
+        const text = await response.text()
+        if (text) {
+          result = JSON.parse(text) as ApiResponse<T>
+        }
+      }
 
       if (!response.ok) {
         const errorMessage =
@@ -103,18 +126,23 @@ export function useApiMutation<T, U = any>(
             ? result.error
             : Array.isArray(result.error)
               ? result.error.join(", ")
-              : "An error occurred"
+              : `Request failed with status ${response.status}`
 
         throw new Error(errorMessage)
       }
 
+      // Handle both cases: with data and without data
       if (result.data) {
         setData(result.data)
         setIsSuccess(true)
         onSuccess?.(result.data)
+        return result.data
+      } else {
+        // Handle successful but empty responses
+        setIsSuccess(true)
+        onSuccess?.(null)
+        return null
       }
-
-      return result.data
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred"
       setError(errorMessage)
@@ -139,3 +167,4 @@ export function useApiMutation<T, U = any>(
     },
   }
 }
+

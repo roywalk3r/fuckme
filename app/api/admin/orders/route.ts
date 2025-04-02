@@ -106,46 +106,32 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
-    // Parse and validate request body
     const body = await req.json()
     const { id, ...data } = orderUpdateSchema.parse(body)
 
-    // Update order
+    // Manually map field names if Prisma expects `payment_status`
+    const dbData: any = {}
+    if (data.status) dbData.status = data.status
+    if (data.paymentStatus) dbData.payment_status = data.paymentStatus // Use snake_case
+
     const order = await prisma.order.update({
       where: { id },
-      data: {
-        status: data.status,
-        paymentStatus: data.paymentStatus,
-      },
+      data: dbData,
       include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
+        user: { select: { id: true, name: true, email: true } },
         order_items: {
           include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-                images: true,
-              },
-            },
+            product: { select: { id: true, name: true, images: true } },
           },
         },
         payment: true,
       },
     })
 
-    return createApiResponse({
-      data: order,
-      status: 200,
-    })
+    return createApiResponse({ data: order, status: 200 })
   } catch (error) {
     return handleApiError(error)
   }
 }
+
 

@@ -49,16 +49,13 @@ export default function AdminUsersPage() {
   // Update user mutation
   const { mutate: updateUser, isLoading: isUpdating } = useApiMutation(`/api/admin/users`, "PATCH", {
     onSuccess: () => {
-      toast.success( "User updated",{
-        description: "The user role has been updated successfully.",
-      })
+      toast.success("User role updated successfully")
       refetch()
       setEditingUser(null)
     },
     onError: (error) => {
-      toast.error( "Error",{
-        description: error,
-      })
+      toast.error(`Error updating user: ${error}`)
+      console.error("Update error:", error)
     },
   })
 
@@ -70,18 +67,19 @@ export default function AdminUsersPage() {
 
   const handleUpdateUser = () => {
     if (editingUser && role) {
+      console.log("Updating user with role:", role)
       updateUser({
         id: editingUser.id,
-        role,
+        role: role.toLowerCase(), // Ensure role is lowercase to match schema
       })
     }
   }
 
   const getRoleBadgeVariant = (role: string) => {
-    switch (role) {
-      case "ADMIN":
+    switch (role?.toLowerCase()) {
+      case "admin":
         return "destructive"
-      case "STAFF":
+      case "staff":
         return "default"
       default:
         return "outline"
@@ -89,10 +87,10 @@ export default function AdminUsersPage() {
   }
 
   const getRoleIcon = (role: string) => {
-    switch (role) {
-      case "ADMIN":
+    switch (role?.toLowerCase()) {
+      case "admin":
         return <Shield className="h-4 w-4 mr-1" />
-      case "STAFF":
+      case "staff":
         return <UserCog className="h-4 w-4 mr-1" />
       default:
         return <User className="h-4 w-4 mr-1" />
@@ -172,7 +170,7 @@ console.log(data)
                         </Badge>
                       </TableCell>
                       <TableCell>{user._count?.orders || 0}</TableCell>
-                      <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

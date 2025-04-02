@@ -218,9 +218,20 @@ exports.Prisma.Wishlist_itemScalarFieldEnum = {
   product_id: 'product_id'
 };
 
+exports.Prisma.SettingsScalarFieldEnum = {
+  type: 'type',
+  value: 'value',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -231,6 +242,12 @@ exports.Prisma.QueryMode = {
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 exports.user_role = exports.$Enums.user_role = {
   admin: 'admin',
@@ -268,7 +285,8 @@ exports.Prisma.ModelName = {
   address: 'address',
   shipping_address: 'shipping_address',
   wishlist: 'wishlist',
-  wishlist_item: 'wishlist_item'
+  wishlist_item: 'wishlist_item',
+  settings: 'settings'
 };
 
 /**

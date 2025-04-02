@@ -1,207 +1,295 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
-import {
-  Search, Filter, MoreHorizontal, Edit, Eye, ArrowUpDown, Package, CreditCard
-} from "lucide-react"
-import { useApi, useApiMutation } from "@/lib/hooks/use-api"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { toast } from "sonner"
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle
-} from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Input } from "@/components/ui/input"
+import { Loader2, Filter, X } from "lucide-react"
+import { toast } from "sonner"
 
-export default function AdminOrdersPage() {
-  const [search, setSearch] = useState("")
-  const [page, setPage] = useState(1)
-  const [editingOrder, setEditingOrder] = useState<any>(null)
+export default function OrdersPage() {
+  const router = useRouter()
+  const [orders, setOrders] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [status, setStatus] = useState("")
   const [paymentStatus, setPaymentStatus] = useState("")
+  const [customerEmail, setCustomerEmail] = useState("")
+  const [hasActiveFilters, setHasActiveFilters] = useState(false)
 
-  // Fetch orders
-  const { data, isLoading, refetch } = useApi<any>(`/api/admin/orders?page=${page}&search=${search}`)
+  useEffect(() => {
+    fetchOrders()
+  }, [])
 
-  // Update order mutation
-  const { mutate: updateOrder, isLoading: isUpdating } = useApiMutation(`/api/admin/orders`, "PATCH", {
-    onSuccess: () => {
-      toast.success("Order updated", {
-        description: "The order status has been updated successfully.",
+  const fetchOrders = async (queryString = "") => {
+    setLoading(true)
+    try {
+      const response = await fetch(`/api/admin/orders${queryString}`)
+      const data = await response.json()
+console.log(data)
+      if (data.data.orders) {
+        setOrders(data.data.orders)
+      } else {
+        toast.error( "Error",{
+          description: "Failed to load orders",
+        })
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error)
+      toast.error( "Error",{
+        description: "Failed to load orders",
       })
-      refetch()
-      setEditingOrder(null)
-    },
-    onError: (error) => {
-      toast.error("Error", { description: error })
-    },
-  })
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    setPage(1)
-    refetch()
-  }
-
-  const handleUpdateOrder = () => {
-    if (editingOrder) {
-      const updateData: any = { id: editingOrder.id, status, payment_status: paymentStatus }
-      updateOrder(updateData)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const getStatusBadgeVariant = (status: string) => ({
-    PROCESSING: "secondary",
-    SHIPPED: "default",
-    DELIVERED: "success",
-    CANCELLED: "destructive",
-  }[status] || "outline")
+  const buildQueryString = () => {
+    const params = new URLSearchParams()
+    if (status) params.append("status", status)
+    if (paymentStatus) params.append("paymentStatus", paymentStatus)
+    if (customerEmail) params.append("customerEmail", customerEmail)
 
-  const getPaymentStatusBadgeVariant = (status: string) => ({
-    PAID: "success",
-    PENDING: "outline",
-    FAILED: "destructive",
-    REFUNDED: "secondary",
-  }[status] || "outline")
+    const queryString = params.toString()
+    return queryString ? `?${queryString}` : ""
+  }
 
-  const orders = data?.orders || []
-  const pagination = data?.pagination || { total: 0, pages: 1 }
+  const applyFilters = () => {
+    const queryString = buildQueryString()
+    fetchOrders(queryString)
+    setHasActiveFilters(!!status || !!paymentStatus || !!customerEmail)
+  }
 
-  console.log("🚀 ~ Admin Orders Data:", data)
+  const resetFilters = () => {
+    setStatus("")
+    setPaymentStatus("")
+    setCustomerEmail("")
+    fetchOrders()
+    setHasActiveFilters(false)
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
+  }
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount)
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800"
+      case "shipped":
+        return "bg-blue-100 text-blue-800"
+      case "delivered":
+        return "bg-green-100 text-green-800"
+      case "canceled":
+        return "bg-red-100 text-red-800"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
+  }
+
+  const getPaymentStatusColor = (status: string) => {
+    switch (status) {
+      case "paid":
+        return "bg-green-100 text-green-800"
+      case "unpaid":
+        return "bg-red-100 text-red-800"
+      case "refunded":
+        return "bg-purple-100 text-purple-800"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
+  }
+
+  const activeFilterCount = [status ? 1 : 0, paymentStatus ? 1 : 0, customerEmail ? 1 : 0].reduce((a, b) => a + b, 0)
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
-      </div>
+    <div className="container mx-auto py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Orders</h1>
+        <div className="flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                Filter
+                {activeFilterCount > 0 && (
+                  <Badge variant="secondary" className="ml-1">
+                    {activeFilterCount}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="space-y-4">
+                <h3 className="font-medium">Filter Orders</h3>
 
-      <div className="flex items-center justify-between">
-        <form onSubmit={handleSearch} className="flex w-full max-w-sm items-center space-x-2">
-          <Input type="search" placeholder="Search orders..." value={search} onChange={(e) => setSearch(e.target.value)} />
-          <Button type="submit">
-            <Search className="h-4 w-4" />
-          </Button>
-        </form>
-        <Button variant="outline">
-          <Filter className="mr-2 h-4 w-4" />
-          Filter
-        </Button>
-      </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Order Status</label>
+                  <Select value={status} onValueChange={setStatus}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Any status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Any status</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="shipped">Shipped</SelectItem>
+                      <SelectItem value="delivered">Delivered</SelectItem>
+                      <SelectItem value="canceled">Canceled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-      {isLoading ? (
-        <div className="space-y-2">
-          {Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Payment Status</label>
+                  <Select value={paymentStatus} onValueChange={setPaymentStatus}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Any payment status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any payment status</SelectItem>
+                      <SelectItem value="unpaid">Unpaid</SelectItem>
+                      <SelectItem value="paid">Paid</SelectItem>
+                      <SelectItem value="refunded">Refunded</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Customer Email</label>
+                  <Input
+                    placeholder="Enter customer email"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex justify-between">
+                  <Button variant="outline" onClick={resetFilters}>
+                    Reset
+                  </Button>
+                  <Button onClick={applyFilters}>Apply Filters</Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
-      ) : (
-        <>
-          <div className="rounded-md border">
+      </div>
+
+      {hasActiveFilters && (
+        <div className="mb-4 flex flex-wrap gap-2">
+          {status && (
+            <Badge variant="outline" className="flex items-center gap-1">
+              Status: {status}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => {
+                  setStatus("")
+                  applyFilters()
+                }}
+              />
+            </Badge>
+          )}
+          {paymentStatus && (
+            <Badge variant="outline" className="flex items-center gap-1">
+              Payment: {paymentStatus}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => {
+                  setPaymentStatus("")
+                  applyFilters()
+                }}
+              />
+            </Badge>
+          )}
+          {customerEmail && (
+            <Badge variant="outline" className="flex items-center gap-1">
+              Email: {customerEmail}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => {
+                  setCustomerEmail("")
+                  applyFilters()
+                }}
+              />
+            </Badge>
+          )}
+          <Button variant="ghost" size="sm" onClick={resetFilters}>
+            Clear all
+          </Button>
+        </div>
+      )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>All Orders</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="flex justify-center items-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : orders.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">No orders found</p>
+            </div>
+          ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>
-                    <div className="flex items-center space-x-1">
-                      <span>Order ID</span>
-                      <ArrowUpDown className="h-4 w-4" />
-                    </div>
-                  </TableHead>
+                  <TableHead>Order ID</TableHead>
+                  <TableHead>Date</TableHead>
                   <TableHead>Customer</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Payment</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orders.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">No orders found</TableCell>
+                {orders.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell className="font-medium">#{order.id.substring(0, 8)}</TableCell>
+                    <TableCell>{formatDate(order.created_at)}</TableCell>
+                    <TableCell>{order.user?.email || "N/A"}</TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(order.status)}>
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getPaymentStatusColor(order.payment_status)}>
+                        {order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">{formatCurrency(Number(order.total_amount))}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="outline" size="sm" onClick={() => router.push(`/admin/orders/${order.id}`)}>
+                        View
+                      </Button>
+                    </TableCell>
                   </TableRow>
-                ) : (
-                  orders.map((order: any) => (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-medium">{order.id.substring(0, 8)}</TableCell>
-                      <TableCell>{order.user?.name || order.user?.email || "N/A"}</TableCell>
-                      <TableCell className="capitalize">
-                        <Badge variant={getStatusBadgeVariant(order.status)}>
-                          <Package className="h-3 w-3 mr-1" />
-                          {order.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={getPaymentStatusBadgeVariant(order.payment_status)}>
-                          <CreditCard className="h-3 w-3 mr-1" />
-                          {order.payment_status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>${Number(order.total_amount)?.toFixed(2)}</TableCell>
-                      <TableCell>
-                        {new Date(order.created_at).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "2-digit",
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => {
-                              setEditingOrder(order)
-                              setStatus(order.status)
-                              setPaymentStatus(order.payment_status)
-                            }}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Update Status
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>
-                              <Eye className="mr-2 h-4 w-4" />
-                              View Details
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
+                ))}
               </TableBody>
             </Table>
-          </div>
-
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious onClick={() => setPage(page > 1 ? page - 1 : 1)} disabled={page <= 1} />
-              </PaginationItem>
-              {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((p) => (
-                <PaginationItem key={p}>
-                  <PaginationLink size="sm" isActive={page === p} onClick={() => setPage(p)}>
-                    {p}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              <PaginationItem>
-                <PaginationNext onClick={() => setPage(page < pagination.pages ? page + 1 : pagination.pages)} disabled={page >= pagination.pages} />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </>
-      )}
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
+

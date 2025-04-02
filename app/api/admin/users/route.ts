@@ -86,6 +86,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
+
 export async function PATCH(req: NextRequest) {
   // Check admin authorization
   const authResponse = await adminAuthMiddleware(req)
@@ -97,6 +98,8 @@ export async function PATCH(req: NextRequest) {
     // Parse and validate request body
     const body = await req.json()
     const { id, ...data } = userUpdateSchema.parse(body)
+
+    console.log("Updating user:", id, "with data:", data)
 
     // Update user
     const user = await prisma.users.update({
@@ -117,6 +120,7 @@ export async function PATCH(req: NextRequest) {
       status: 200,
     })
   } catch (error) {
+    console.error("Error updating user:", error)
     return handleApiError(error)
   }
 }

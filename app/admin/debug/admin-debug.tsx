@@ -1,132 +1,133 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useApi } from "@/lib/hooks/use-api"
 import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Loader2, RefreshCw, AlertTriangle, CheckCircle } from "lucide-react"
 
-export default function AdminDebugPage() {
-  const [activeTab, setActiveTab] = useState("routes")
-  const [routeData, setRouteData] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const testRoutes = [
-    { name: "Admin Check", path: "/api/admin/check" },
-    { name: "Products List", path: "/api/admin/products" },
-    { name: "Single Product", path: "/api/admin/products/cm8vkky97000a9ra5on690cxj" },
-    { name: "Users List", path: "/api/admin/users" },
-    { name: "Orders List", path: "/api/admin/orders" },
-    { name: "Dashboard Stats", path: "/api/admin/dashboard" },
-  ]
-
-  const testRoute = async (path: string) => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      const response = await fetch(path)
-      const data = await response.json()
-      setRouteData({
-        status: response.status,
-        statusText: response.statusText,
-        data: data,
-      })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error")
-      setRouteData(null)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+export default function DebugPage() {
+  const { data, isLoading, error, refetch } = useApi<any>("/api/admin/debug")
+  const [showRaw, setShowRaw] = useState(false)
 
   return (
-    <div className="container py-10">
-      <Card>
-        <CardHeader>
-          <CardTitle>Admin Panel Debug Tools</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-3 mb-4">
-              <TabsTrigger value="routes">API Routes</TabsTrigger>
-              <TabsTrigger value="auth">Authentication</TabsTrigger>
-              <TabsTrigger value="data">Data Structure</TabsTrigger>
-            </TabsList>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight">System Diagnostics</h1>
+        <Button variant="outline" onClick={() => refetch()} disabled={isLoading}>
+          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+          Refresh
+        </Button>
+      </div>
 
-            <TabsContent value="routes" className="space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {testRoutes.map((route) => (
-                  <Button key={route.path} variant="outline" onClick={() => testRoute(route.path)}>
-                    Test {route.name}
-                  </Button>
-                ))}
+      {error && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {isLoading ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Loading...</CardTitle>
+            <CardDescription>Fetching system information</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-center p-6">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          </CardContent>
+        </Card>
+      ) : data?.data ? (
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle>Database Connection</CardTitle>
+              <CardDescription>Status of the database connection</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center space-x-2">
+                {data.data.dbConnected ? (
+                  <>
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span>Connected</span>
+                  </>
+                ) : (
+                  <>
+                    <AlertTriangle className="h-5 w-5 text-red-500" />
+                    <span>Disconnected</span>
+                  </>
+                )}
               </div>
 
-              {isLoading && (
-                <div className="flex items-center justify-center p-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                </div>
-              )}
-
-              {error && <div className="p-4 bg-red-50 text-red-500 rounded-md">Error: {error}</div>}
-
-              {routeData && (
+              {data.data.dbInfo && (
                 <div className="mt-4">
-                  <div className="flex gap-2 mb-2">
-                    <span className="font-semibold">Status:</span>
-                    <span className={routeData.status >= 400 ? "text-red-500" : "text-green-500"}>
-                      {routeData.status} {routeData.statusText}
-                    </span>
-                  </div>
-                  <div className="bg-muted p-4 rounded-md overflow-auto max-h-[500px]">
-                    <pre>{JSON.stringify(routeData.data, null, 2)}</pre>
-                  </div>
+                  <h3 className="text-sm font-medium">Database Version</h3>
+                  <pre className="mt-1 rounded bg-muted p-2 text-xs">{JSON.stringify(data.data.dbInfo, null, 2)}</pre>
                 </div>
               )}
-            </TabsContent>
+            </CardContent>
+          </Card>
 
-            <TabsContent value="auth">
+          <Card>
+            <CardHeader>
+              <CardTitle>Settings Data</CardTitle>
+              <CardDescription>Information about settings in the database</CardDescription>
+            </CardHeader>
+            <CardContent>
               <div className="space-y-4">
-                <Button onClick={() => testRoute("/api/admin/check")}>Check Admin Status</Button>
+                <div>
+                  <h3 className="text-sm font-medium">Settings Count</h3>
+                  <p className="text-2xl font-bold">{data.data.settingsCount}</p>
+                </div>
 
-                <div className="p-4 bg-yellow-50 text-yellow-700 rounded-md">
-                  <p className="font-medium">Authentication Troubleshooting:</p>
-                  <ul className="list-disc pl-5 mt-2">
-                    <li>Ensure you're logged in with a Clerk account</li>
-                    <li>Check that your user has the "admin" role in the database</li>
-                    <li>Verify that the Clerk webhook is properly configured</li>
-                    <li>Check for CORS issues in the browser console</li>
-                  </ul>
+                {data.data.settingsData && (
+                  <div>
+                    <h3 className="text-sm font-medium">Settings Records</h3>
+                    <pre className="mt-1 rounded bg-muted p-2 text-xs">
+                      {JSON.stringify(data.data.settingsData, null, 2)}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Environment Information</CardTitle>
+              <CardDescription>System environment details</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium">Node Environment</h3>
+                  <p className="text-lg font-medium">{data.data.environment}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium">Server Time</h3>
+                  <p className="text-lg font-medium">{new Date(data.data.timestamp).toLocaleString()}</p>
                 </div>
               </div>
-            </TabsContent>
+            </CardContent>
+          </Card>
 
-            <TabsContent value="data">
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-2">
-                  <Button onClick={() => testRoute("/api/admin/products")}>Check Products Data</Button>
-                  <Button onClick={() => testRoute("/api/admin/users")}>Check Users Data</Button>
-                </div>
+          <div className="mt-6">
+            <Button variant="outline" onClick={() => setShowRaw(!showRaw)}>
+              {showRaw ? "Hide" : "Show"} Raw Response
+            </Button>
 
-                <div className="p-4 bg-blue-50 text-blue-700 rounded-md">
-                  <p className="font-medium">Data Structure Notes:</p>
-                  <ul className="list-disc pl-5 mt-2">
-                    <li>
-                      API responses should follow the format: <code>{`{ data: {...}, error: null }`}</code>
-                    </li>
-                    <li>
-                      Products data is nested under <code>data.products</code>
-                    </li>
-                    <li>Check for field name mismatches (e.g., snake_case vs. camelCase)</li>
-                    <li>Verify that IDs are correctly formatted and referenced</li>
-                  </ul>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+            {showRaw && (
+              <pre className="mt-4 rounded bg-muted p-4 text-xs overflow-auto max-h-96">
+                {JSON.stringify(data, null, 2)}
+              </pre>
+            )}
+          </div>
+        </>
+      ) : null}
     </div>
   )
 }

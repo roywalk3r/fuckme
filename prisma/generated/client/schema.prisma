@@ -133,6 +133,13 @@ model wishlist_item {
   wishlist    wishlist @relation(fields: [wishlist_id], references: [id])
 }
 
+model settings {
+  type       String   @id @unique
+  value      Json
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
 enum user_role {
   admin
   staff

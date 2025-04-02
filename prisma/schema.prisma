@@ -132,6 +132,14 @@ model wishlist_item {
   product     product  @relation(fields: [product_id], references: [id])
   wishlist    wishlist @relation(fields: [wishlist_id], references: [id])
 }
+model Settings {
+  type      String   @id
+  value     Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
 
 enum user_role {
   admin
