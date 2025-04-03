@@ -164,9 +164,8 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    const url = new URL(req.url)
-    const id = url.searchParams.get("id")
-
+    const url = new URL(req.url);
+    const id = url.pathname.split("/").pop();
     if (!id) {
       return createApiResponse({
         error: "Product ID is required",

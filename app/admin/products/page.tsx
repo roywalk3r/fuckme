@@ -77,10 +77,12 @@ export default function AdminProductsPage() {
     try {
       const response = await fetch(`/api/admin/products/${productToDelete.id}`, {
         method: "DELETE",
-      })
+      } 
+    )
 
+    console.log(response, "PDFF")
       if (!response.ok) {
-        throw new Error("Failed to delete product")
+        throw new Error("Failed to delete product", { cause: response.statusText })
       }
 
       setProducts(products.filter((p) => p.id !== productToDelete.id))

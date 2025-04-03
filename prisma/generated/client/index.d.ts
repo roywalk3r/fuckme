@@ -69,10 +69,10 @@ export type wishlist = $Result.DefaultSelection<Prisma.$wishlistPayload>
  */
 export type wishlist_item = $Result.DefaultSelection<Prisma.$wishlist_itemPayload>
 /**
- * Model settings
+ * Model Settings
  * 
  */
-export type settings = $Result.DefaultSelection<Prisma.$settingsPayload>
+export type Settings = $Result.DefaultSelection<Prisma.$SettingsPayload>
 
 /**
  * Enums
@@ -368,14 +368,14 @@ export class PrismaClient<
   get wishlist_item(): Prisma.wishlist_itemDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.settings`: Exposes CRUD operations for the **settings** model.
+   * `prisma.settings`: Exposes CRUD operations for the **Settings** model.
     * Example usage:
     * ```ts
     * // Fetch zero or more Settings
     * const settings = await prisma.settings.findMany()
     * ```
     */
-  get settings(): Prisma.settingsDelegate<ExtArgs, ClientOptions>;
+  get settings(): Prisma.SettingsDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -827,7 +827,7 @@ export namespace Prisma {
     shipping_address: 'shipping_address',
     wishlist: 'wishlist',
     wishlist_item: 'wishlist_item',
-    settings: 'settings'
+    Settings: 'Settings'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1664,76 +1664,76 @@ export namespace Prisma {
           }
         }
       }
-      settings: {
-        payload: Prisma.$settingsPayload<ExtArgs>
-        fields: Prisma.settingsFieldRefs
+      Settings: {
+        payload: Prisma.$SettingsPayload<ExtArgs>
+        fields: Prisma.SettingsFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.settingsFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$settingsPayload> | null
+            args: Prisma.SettingsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.settingsFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$settingsPayload>
+            args: Prisma.SettingsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>
           }
           findFirst: {
-            args: Prisma.settingsFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$settingsPayload> | null
+            args: Prisma.SettingsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.settingsFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$settingsPayload>
+            args: Prisma.SettingsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>
           }
           findMany: {
-            args: Prisma.settingsFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$settingsPayload>[]
+            args: Prisma.SettingsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>[]
           }
           create: {
-            args: Prisma.settingsCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$settingsPayload>
+            args: Prisma.SettingsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>
           }
           createMany: {
-            args: Prisma.settingsCreateManyArgs<ExtArgs>
+            args: Prisma.SettingsCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.settingsCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$settingsPayload>[]
+            args: Prisma.SettingsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>[]
           }
           delete: {
-            args: Prisma.settingsDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$settingsPayload>
+            args: Prisma.SettingsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>
           }
           update: {
-            args: Prisma.settingsUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$settingsPayload>
+            args: Prisma.SettingsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>
           }
           deleteMany: {
-            args: Prisma.settingsDeleteManyArgs<ExtArgs>
+            args: Prisma.SettingsDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.settingsUpdateManyArgs<ExtArgs>
+            args: Prisma.SettingsUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateManyAndReturn: {
-            args: Prisma.settingsUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$settingsPayload>[]
+            args: Prisma.SettingsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>[]
           }
           upsert: {
-            args: Prisma.settingsUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$settingsPayload>
+            args: Prisma.SettingsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingsPayload>
           }
           aggregate: {
             args: Prisma.SettingsAggregateArgs<ExtArgs>
             result: $Utils.Optional<AggregateSettings>
           }
           groupBy: {
-            args: Prisma.settingsGroupByArgs<ExtArgs>
+            args: Prisma.SettingsGroupByArgs<ExtArgs>
             result: $Utils.Optional<SettingsGroupByOutputType>[]
           }
           count: {
-            args: Prisma.settingsCountArgs<ExtArgs>
+            args: Prisma.SettingsCountArgs<ExtArgs>
             result: $Utils.Optional<SettingsCountAggregateOutputType> | number
           }
         }
@@ -1833,7 +1833,7 @@ export namespace Prisma {
     shipping_address?: shipping_addressOmit
     wishlist?: wishlistOmit
     wishlist_item?: wishlist_itemOmit
-    settings?: settingsOmit
+    settings?: SettingsOmit
   }
 
   /* Types for Logging */
@@ -14385,7 +14385,7 @@ export namespace Prisma {
 
 
   /**
-   * Model settings
+   * Model Settings
    */
 
   export type AggregateSettings = {
@@ -14396,78 +14396,78 @@ export namespace Prisma {
 
   export type SettingsMinAggregateOutputType = {
     type: string | null
-    created_at: Date | null
-    updated_at: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type SettingsMaxAggregateOutputType = {
     type: string | null
-    created_at: Date | null
-    updated_at: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type SettingsCountAggregateOutputType = {
     type: number
     value: number
-    created_at: number
-    updated_at: number
+    createdAt: number
+    updatedAt: number
     _all: number
   }
 
 
   export type SettingsMinAggregateInputType = {
     type?: true
-    created_at?: true
-    updated_at?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type SettingsMaxAggregateInputType = {
     type?: true
-    created_at?: true
-    updated_at?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type SettingsCountAggregateInputType = {
     type?: true
     value?: true
-    created_at?: true
-    updated_at?: true
+    createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
   export type SettingsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which settings to aggregate.
+     * Filter which Settings to aggregate.
      */
-    where?: settingsWhereInput
+    where?: SettingsWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of settings to fetch.
+     * Determine the order of Settings to fetch.
      */
-    orderBy?: settingsOrderByWithRelationInput | settingsOrderByWithRelationInput[]
+    orderBy?: SettingsOrderByWithRelationInput | SettingsOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: settingsWhereUniqueInput
+    cursor?: SettingsWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` settings from the position of the cursor.
+     * Take `±n` Settings from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` settings.
+     * Skip the first `n` Settings.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned settings
+     * Count returned Settings
     **/
     _count?: true | SettingsCountAggregateInputType
     /**
@@ -14495,11 +14495,11 @@ export namespace Prisma {
 
 
 
-  export type settingsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: settingsWhereInput
-    orderBy?: settingsOrderByWithAggregationInput | settingsOrderByWithAggregationInput[]
+  export type SettingsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SettingsWhereInput
+    orderBy?: SettingsOrderByWithAggregationInput | SettingsOrderByWithAggregationInput[]
     by: SettingsScalarFieldEnum[] | SettingsScalarFieldEnum
-    having?: settingsScalarWhereWithAggregatesInput
+    having?: SettingsScalarWhereWithAggregatesInput
     take?: number
     skip?: number
     _count?: SettingsCountAggregateInputType | true
@@ -14510,14 +14510,14 @@ export namespace Prisma {
   export type SettingsGroupByOutputType = {
     type: string
     value: JsonValue
-    created_at: Date
-    updated_at: Date
+    createdAt: Date
+    updatedAt: Date
     _count: SettingsCountAggregateOutputType | null
     _min: SettingsMinAggregateOutputType | null
     _max: SettingsMaxAggregateOutputType | null
   }
 
-  type GetSettingsGroupByPayload<T extends settingsGroupByArgs> = Prisma.PrismaPromise<
+  type GetSettingsGroupByPayload<T extends SettingsGroupByArgs> = Prisma.PrismaPromise<
     Array<
       PickEnumerable<SettingsGroupByOutputType, T['by']> &
         {
@@ -14531,60 +14531,60 @@ export namespace Prisma {
     >
 
 
-  export type settingsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type SettingsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     type?: boolean
     value?: boolean
-    created_at?: boolean
-    updated_at?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["settings"]>
 
-  export type settingsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type SettingsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     type?: boolean
     value?: boolean
-    created_at?: boolean
-    updated_at?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["settings"]>
 
-  export type settingsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type SettingsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     type?: boolean
     value?: boolean
-    created_at?: boolean
-    updated_at?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["settings"]>
 
-  export type settingsSelectScalar = {
+  export type SettingsSelectScalar = {
     type?: boolean
     value?: boolean
-    created_at?: boolean
-    updated_at?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type settingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"type" | "value" | "created_at" | "updated_at", ExtArgs["result"]["settings"]>
+  export type SettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"type" | "value" | "createdAt" | "updatedAt", ExtArgs["result"]["settings"]>
 
-  export type $settingsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "settings"
+  export type $SettingsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Settings"
     objects: {}
     scalars: $Extensions.GetPayloadResult<{
       type: string
       value: Prisma.JsonValue
-      created_at: Date
-      updated_at: Date
+      createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["settings"]>
     composites: {}
   }
 
-  type settingsGetPayload<S extends boolean | null | undefined | settingsDefaultArgs> = $Result.GetResult<Prisma.$settingsPayload, S>
+  type SettingsGetPayload<S extends boolean | null | undefined | SettingsDefaultArgs> = $Result.GetResult<Prisma.$SettingsPayload, S>
 
-  type settingsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<settingsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  type SettingsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SettingsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
       select?: SettingsCountAggregateInputType | true
     }
 
-  export interface settingsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['settings'], meta: { name: 'settings' } }
+  export interface SettingsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Settings'], meta: { name: 'Settings' } }
     /**
      * Find zero or one Settings that matches the filter.
-     * @param {settingsFindUniqueArgs} args - Arguments to find a Settings
+     * @param {SettingsFindUniqueArgs} args - Arguments to find a Settings
      * @example
      * // Get one Settings
      * const settings = await prisma.settings.findUnique({
@@ -14593,12 +14593,12 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends settingsFindUniqueArgs>(args: SelectSubset<T, settingsFindUniqueArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findUnique<T extends SettingsFindUniqueArgs>(args: SelectSubset<T, SettingsFindUniqueArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find one Settings that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
-     * @param {settingsFindUniqueOrThrowArgs} args - Arguments to find a Settings
+     * @param {SettingsFindUniqueOrThrowArgs} args - Arguments to find a Settings
      * @example
      * // Get one Settings
      * const settings = await prisma.settings.findUniqueOrThrow({
@@ -14607,13 +14607,13 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends settingsFindUniqueOrThrowArgs>(args: SelectSubset<T, settingsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findUniqueOrThrow<T extends SettingsFindUniqueOrThrowArgs>(args: SelectSubset<T, SettingsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Settings that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {settingsFindFirstArgs} args - Arguments to find a Settings
+     * @param {SettingsFindFirstArgs} args - Arguments to find a Settings
      * @example
      * // Get one Settings
      * const settings = await prisma.settings.findFirst({
@@ -14622,14 +14622,14 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends settingsFindFirstArgs>(args?: SelectSubset<T, settingsFindFirstArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findFirst<T extends SettingsFindFirstArgs>(args?: SelectSubset<T, SettingsFindFirstArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Settings that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {settingsFindFirstOrThrowArgs} args - Arguments to find a Settings
+     * @param {SettingsFindFirstOrThrowArgs} args - Arguments to find a Settings
      * @example
      * // Get one Settings
      * const settings = await prisma.settings.findFirstOrThrow({
@@ -14638,13 +14638,13 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends settingsFindFirstOrThrowArgs>(args?: SelectSubset<T, settingsFindFirstOrThrowArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findFirstOrThrow<T extends SettingsFindFirstOrThrowArgs>(args?: SelectSubset<T, SettingsFindFirstOrThrowArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more Settings that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {settingsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {SettingsFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
      * // Get all Settings
      * const settings = await prisma.settings.findMany()
@@ -14656,11 +14656,11 @@ export namespace Prisma {
      * const settingsWithTypeOnly = await prisma.settings.findMany({ select: { type: true } })
      * 
      */
-    findMany<T extends settingsFindManyArgs>(args?: SelectSubset<T, settingsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+    findMany<T extends SettingsFindManyArgs>(args?: SelectSubset<T, SettingsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a Settings.
-     * @param {settingsCreateArgs} args - Arguments to create a Settings.
+     * @param {SettingsCreateArgs} args - Arguments to create a Settings.
      * @example
      * // Create one Settings
      * const Settings = await prisma.settings.create({
@@ -14670,11 +14670,11 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends settingsCreateArgs>(args: SelectSubset<T, settingsCreateArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    create<T extends SettingsCreateArgs>(args: SelectSubset<T, SettingsCreateArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many Settings.
-     * @param {settingsCreateManyArgs} args - Arguments to create many Settings.
+     * @param {SettingsCreateManyArgs} args - Arguments to create many Settings.
      * @example
      * // Create many Settings
      * const settings = await prisma.settings.createMany({
@@ -14684,11 +14684,11 @@ export namespace Prisma {
      * })
      *     
      */
-    createMany<T extends settingsCreateManyArgs>(args?: SelectSubset<T, settingsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends SettingsCreateManyArgs>(args?: SelectSubset<T, SettingsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
      * Create many Settings and returns the data saved in the database.
-     * @param {settingsCreateManyAndReturnArgs} args - Arguments to create many Settings.
+     * @param {SettingsCreateManyAndReturnArgs} args - Arguments to create many Settings.
      * @example
      * // Create many Settings
      * const settings = await prisma.settings.createManyAndReturn({
@@ -14708,11 +14708,11 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends settingsCreateManyAndReturnArgs>(args?: SelectSubset<T, settingsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+    createManyAndReturn<T extends SettingsCreateManyAndReturnArgs>(args?: SelectSubset<T, SettingsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Delete a Settings.
-     * @param {settingsDeleteArgs} args - Arguments to delete one Settings.
+     * @param {SettingsDeleteArgs} args - Arguments to delete one Settings.
      * @example
      * // Delete one Settings
      * const Settings = await prisma.settings.delete({
@@ -14722,11 +14722,11 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends settingsDeleteArgs>(args: SelectSubset<T, settingsDeleteArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    delete<T extends SettingsDeleteArgs>(args: SelectSubset<T, SettingsDeleteArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one Settings.
-     * @param {settingsUpdateArgs} args - Arguments to update one Settings.
+     * @param {SettingsUpdateArgs} args - Arguments to update one Settings.
      * @example
      * // Update one Settings
      * const settings = await prisma.settings.update({
@@ -14739,11 +14739,11 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends settingsUpdateArgs>(args: SelectSubset<T, settingsUpdateArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    update<T extends SettingsUpdateArgs>(args: SelectSubset<T, SettingsUpdateArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more Settings.
-     * @param {settingsDeleteManyArgs} args - Arguments to filter Settings to delete.
+     * @param {SettingsDeleteManyArgs} args - Arguments to filter Settings to delete.
      * @example
      * // Delete a few Settings
      * const { count } = await prisma.settings.deleteMany({
@@ -14753,13 +14753,13 @@ export namespace Prisma {
      * })
      * 
      */
-    deleteMany<T extends settingsDeleteManyArgs>(args?: SelectSubset<T, settingsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends SettingsDeleteManyArgs>(args?: SelectSubset<T, SettingsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more Settings.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {settingsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {SettingsUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
      * // Update many Settings
      * const settings = await prisma.settings.updateMany({
@@ -14772,11 +14772,11 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends settingsUpdateManyArgs>(args: SelectSubset<T, settingsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends SettingsUpdateManyArgs>(args: SelectSubset<T, SettingsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
      * Update zero or more Settings and returns the data updated in the database.
-     * @param {settingsUpdateManyAndReturnArgs} args - Arguments to update many Settings.
+     * @param {SettingsUpdateManyAndReturnArgs} args - Arguments to update many Settings.
      * @example
      * // Update many Settings
      * const settings = await prisma.settings.updateManyAndReturn({
@@ -14802,11 +14802,11 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    updateManyAndReturn<T extends settingsUpdateManyAndReturnArgs>(args: SelectSubset<T, settingsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+    updateManyAndReturn<T extends SettingsUpdateManyAndReturnArgs>(args: SelectSubset<T, SettingsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Create or update one Settings.
-     * @param {settingsUpsertArgs} args - Arguments to update or create a Settings.
+     * @param {SettingsUpsertArgs} args - Arguments to update or create a Settings.
      * @example
      * // Update or create a Settings
      * const settings = await prisma.settings.upsert({
@@ -14821,14 +14821,14 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends settingsUpsertArgs>(args: SelectSubset<T, settingsUpsertArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    upsert<T extends SettingsUpsertArgs>(args: SelectSubset<T, SettingsUpsertArgs<ExtArgs>>): Prisma__SettingsClient<$Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
      * Count the number of Settings.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {settingsCountArgs} args - Arguments to filter Settings to count.
+     * @param {SettingsCountArgs} args - Arguments to filter Settings to count.
      * @example
      * // Count the number of Settings
      * const count = await prisma.settings.count({
@@ -14837,8 +14837,8 @@ export namespace Prisma {
      *   }
      * })
     **/
-    count<T extends settingsCountArgs>(
-      args?: Subset<T, settingsCountArgs>,
+    count<T extends SettingsCountArgs>(
+      args?: Subset<T, SettingsCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
@@ -14877,7 +14877,7 @@ export namespace Prisma {
      * Group by Settings.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {settingsGroupByArgs} args - Group by arguments.
+     * @param {SettingsGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -14892,14 +14892,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends settingsGroupByArgs,
+      T extends SettingsGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: settingsGroupByArgs['orderBy'] }
-        : { orderBy?: settingsGroupByArgs['orderBy'] },
+        ? { orderBy: SettingsGroupByArgs['orderBy'] }
+        : { orderBy?: SettingsGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -14948,20 +14948,20 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, settingsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSettingsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, SettingsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSettingsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the settings model
+   * Fields of the Settings model
    */
-  readonly fields: settingsFieldRefs;
+  readonly fields: SettingsFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for settings.
+   * The delegate class that acts as a "Promise-like" for Settings.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__settingsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__SettingsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -14989,376 +14989,376 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the settings model
+   * Fields of the Settings model
    */ 
-  interface settingsFieldRefs {
-    readonly type: FieldRef<"settings", 'String'>
-    readonly value: FieldRef<"settings", 'Json'>
-    readonly created_at: FieldRef<"settings", 'DateTime'>
-    readonly updated_at: FieldRef<"settings", 'DateTime'>
+  interface SettingsFieldRefs {
+    readonly type: FieldRef<"Settings", 'String'>
+    readonly value: FieldRef<"Settings", 'Json'>
+    readonly createdAt: FieldRef<"Settings", 'DateTime'>
+    readonly updatedAt: FieldRef<"Settings", 'DateTime'>
   }
     
 
   // Custom InputTypes
   /**
-   * settings findUnique
+   * Settings findUnique
    */
-  export type settingsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the settings
+     * Select specific fields to fetch from the Settings
      */
-    select?: settingsSelect<ExtArgs> | null
+    select?: SettingsSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the settings
+     * Omit specific fields from the Settings
      */
-    omit?: settingsOmit<ExtArgs> | null
+    omit?: SettingsOmit<ExtArgs> | null
     /**
-     * Filter, which settings to fetch.
+     * Filter, which Settings to fetch.
      */
-    where: settingsWhereUniqueInput
+    where: SettingsWhereUniqueInput
   }
 
   /**
-   * settings findUniqueOrThrow
+   * Settings findUniqueOrThrow
    */
-  export type settingsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the settings
+     * Select specific fields to fetch from the Settings
      */
-    select?: settingsSelect<ExtArgs> | null
+    select?: SettingsSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the settings
+     * Omit specific fields from the Settings
      */
-    omit?: settingsOmit<ExtArgs> | null
+    omit?: SettingsOmit<ExtArgs> | null
     /**
-     * Filter, which settings to fetch.
+     * Filter, which Settings to fetch.
      */
-    where: settingsWhereUniqueInput
+    where: SettingsWhereUniqueInput
   }
 
   /**
-   * settings findFirst
+   * Settings findFirst
    */
-  export type settingsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the settings
+     * Select specific fields to fetch from the Settings
      */
-    select?: settingsSelect<ExtArgs> | null
+    select?: SettingsSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the settings
+     * Omit specific fields from the Settings
      */
-    omit?: settingsOmit<ExtArgs> | null
+    omit?: SettingsOmit<ExtArgs> | null
     /**
-     * Filter, which settings to fetch.
+     * Filter, which Settings to fetch.
      */
-    where?: settingsWhereInput
+    where?: SettingsWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of settings to fetch.
+     * Determine the order of Settings to fetch.
      */
-    orderBy?: settingsOrderByWithRelationInput | settingsOrderByWithRelationInput[]
+    orderBy?: SettingsOrderByWithRelationInput | SettingsOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for settings.
+     * Sets the position for searching for Settings.
      */
-    cursor?: settingsWhereUniqueInput
+    cursor?: SettingsWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` settings from the position of the cursor.
+     * Take `±n` Settings from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` settings.
+     * Skip the first `n` Settings.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of settings.
+     * Filter by unique combinations of Settings.
      */
     distinct?: SettingsScalarFieldEnum | SettingsScalarFieldEnum[]
   }
 
   /**
-   * settings findFirstOrThrow
+   * Settings findFirstOrThrow
    */
-  export type settingsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the settings
+     * Select specific fields to fetch from the Settings
      */
-    select?: settingsSelect<ExtArgs> | null
+    select?: SettingsSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the settings
+     * Omit specific fields from the Settings
      */
-    omit?: settingsOmit<ExtArgs> | null
+    omit?: SettingsOmit<ExtArgs> | null
     /**
-     * Filter, which settings to fetch.
+     * Filter, which Settings to fetch.
      */
-    where?: settingsWhereInput
+    where?: SettingsWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of settings to fetch.
+     * Determine the order of Settings to fetch.
      */
-    orderBy?: settingsOrderByWithRelationInput | settingsOrderByWithRelationInput[]
+    orderBy?: SettingsOrderByWithRelationInput | SettingsOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for settings.
+     * Sets the position for searching for Settings.
      */
-    cursor?: settingsWhereUniqueInput
+    cursor?: SettingsWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` settings from the position of the cursor.
+     * Take `±n` Settings from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` settings.
+     * Skip the first `n` Settings.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of settings.
+     * Filter by unique combinations of Settings.
      */
     distinct?: SettingsScalarFieldEnum | SettingsScalarFieldEnum[]
   }
 
   /**
-   * settings findMany
+   * Settings findMany
    */
-  export type settingsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the settings
+     * Select specific fields to fetch from the Settings
      */
-    select?: settingsSelect<ExtArgs> | null
+    select?: SettingsSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the settings
+     * Omit specific fields from the Settings
      */
-    omit?: settingsOmit<ExtArgs> | null
+    omit?: SettingsOmit<ExtArgs> | null
     /**
-     * Filter, which settings to fetch.
+     * Filter, which Settings to fetch.
      */
-    where?: settingsWhereInput
+    where?: SettingsWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of settings to fetch.
+     * Determine the order of Settings to fetch.
      */
-    orderBy?: settingsOrderByWithRelationInput | settingsOrderByWithRelationInput[]
+    orderBy?: SettingsOrderByWithRelationInput | SettingsOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing settings.
+     * Sets the position for listing Settings.
      */
-    cursor?: settingsWhereUniqueInput
+    cursor?: SettingsWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` settings from the position of the cursor.
+     * Take `±n` Settings from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` settings.
+     * Skip the first `n` Settings.
      */
     skip?: number
     distinct?: SettingsScalarFieldEnum | SettingsScalarFieldEnum[]
   }
 
   /**
-   * settings create
+   * Settings create
    */
-  export type settingsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the settings
+     * Select specific fields to fetch from the Settings
      */
-    select?: settingsSelect<ExtArgs> | null
+    select?: SettingsSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the settings
+     * Omit specific fields from the Settings
      */
-    omit?: settingsOmit<ExtArgs> | null
+    omit?: SettingsOmit<ExtArgs> | null
     /**
-     * The data needed to create a settings.
+     * The data needed to create a Settings.
      */
-    data: XOR<settingsCreateInput, settingsUncheckedCreateInput>
+    data: XOR<SettingsCreateInput, SettingsUncheckedCreateInput>
   }
 
   /**
-   * settings createMany
+   * Settings createMany
    */
-  export type settingsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many settings.
+     * The data used to create many Settings.
      */
-    data: settingsCreateManyInput | settingsCreateManyInput[]
+    data: SettingsCreateManyInput | SettingsCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * settings createManyAndReturn
+   * Settings createManyAndReturn
    */
-  export type settingsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the settings
+     * Select specific fields to fetch from the Settings
      */
-    select?: settingsSelectCreateManyAndReturn<ExtArgs> | null
+    select?: SettingsSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the settings
+     * Omit specific fields from the Settings
      */
-    omit?: settingsOmit<ExtArgs> | null
+    omit?: SettingsOmit<ExtArgs> | null
     /**
-     * The data used to create many settings.
+     * The data used to create many Settings.
      */
-    data: settingsCreateManyInput | settingsCreateManyInput[]
+    data: SettingsCreateManyInput | SettingsCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * settings update
+   * Settings update
    */
-  export type settingsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the settings
+     * Select specific fields to fetch from the Settings
      */
-    select?: settingsSelect<ExtArgs> | null
+    select?: SettingsSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the settings
+     * Omit specific fields from the Settings
      */
-    omit?: settingsOmit<ExtArgs> | null
+    omit?: SettingsOmit<ExtArgs> | null
     /**
-     * The data needed to update a settings.
+     * The data needed to update a Settings.
      */
-    data: XOR<settingsUpdateInput, settingsUncheckedUpdateInput>
+    data: XOR<SettingsUpdateInput, SettingsUncheckedUpdateInput>
     /**
-     * Choose, which settings to update.
+     * Choose, which Settings to update.
      */
-    where: settingsWhereUniqueInput
+    where: SettingsWhereUniqueInput
   }
 
   /**
-   * settings updateMany
+   * Settings updateMany
    */
-  export type settingsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update settings.
+     * The data used to update Settings.
      */
-    data: XOR<settingsUpdateManyMutationInput, settingsUncheckedUpdateManyInput>
+    data: XOR<SettingsUpdateManyMutationInput, SettingsUncheckedUpdateManyInput>
     /**
-     * Filter which settings to update
+     * Filter which Settings to update
      */
-    where?: settingsWhereInput
+    where?: SettingsWhereInput
     /**
-     * Limit how many settings to update.
+     * Limit how many Settings to update.
      */
     limit?: number
   }
 
   /**
-   * settings updateManyAndReturn
+   * Settings updateManyAndReturn
    */
-  export type settingsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the settings
+     * Select specific fields to fetch from the Settings
      */
-    select?: settingsSelectUpdateManyAndReturn<ExtArgs> | null
+    select?: SettingsSelectUpdateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the settings
+     * Omit specific fields from the Settings
      */
-    omit?: settingsOmit<ExtArgs> | null
+    omit?: SettingsOmit<ExtArgs> | null
     /**
-     * The data used to update settings.
+     * The data used to update Settings.
      */
-    data: XOR<settingsUpdateManyMutationInput, settingsUncheckedUpdateManyInput>
+    data: XOR<SettingsUpdateManyMutationInput, SettingsUncheckedUpdateManyInput>
     /**
-     * Filter which settings to update
+     * Filter which Settings to update
      */
-    where?: settingsWhereInput
+    where?: SettingsWhereInput
     /**
-     * Limit how many settings to update.
+     * Limit how many Settings to update.
      */
     limit?: number
   }
 
   /**
-   * settings upsert
+   * Settings upsert
    */
-  export type settingsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the settings
+     * Select specific fields to fetch from the Settings
      */
-    select?: settingsSelect<ExtArgs> | null
+    select?: SettingsSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the settings
+     * Omit specific fields from the Settings
      */
-    omit?: settingsOmit<ExtArgs> | null
+    omit?: SettingsOmit<ExtArgs> | null
     /**
-     * The filter to search for the settings to update in case it exists.
+     * The filter to search for the Settings to update in case it exists.
      */
-    where: settingsWhereUniqueInput
+    where: SettingsWhereUniqueInput
     /**
-     * In case the settings found by the `where` argument doesn't exist, create a new settings with this data.
+     * In case the Settings found by the `where` argument doesn't exist, create a new Settings with this data.
      */
-    create: XOR<settingsCreateInput, settingsUncheckedCreateInput>
+    create: XOR<SettingsCreateInput, SettingsUncheckedCreateInput>
     /**
-     * In case the settings was found with the provided `where` argument, update it with this data.
+     * In case the Settings was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<settingsUpdateInput, settingsUncheckedUpdateInput>
+    update: XOR<SettingsUpdateInput, SettingsUncheckedUpdateInput>
   }
 
   /**
-   * settings delete
+   * Settings delete
    */
-  export type settingsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the settings
+     * Select specific fields to fetch from the Settings
      */
-    select?: settingsSelect<ExtArgs> | null
+    select?: SettingsSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the settings
+     * Omit specific fields from the Settings
      */
-    omit?: settingsOmit<ExtArgs> | null
+    omit?: SettingsOmit<ExtArgs> | null
     /**
-     * Filter which settings to delete.
+     * Filter which Settings to delete.
      */
-    where: settingsWhereUniqueInput
+    where: SettingsWhereUniqueInput
   }
 
   /**
-   * settings deleteMany
+   * Settings deleteMany
    */
-  export type settingsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which settings to delete
+     * Filter which Settings to delete
      */
-    where?: settingsWhereInput
+    where?: SettingsWhereInput
     /**
-     * Limit how many settings to delete.
+     * Limit how many Settings to delete.
      */
     limit?: number
   }
 
   /**
-   * settings without action
+   * Settings without action
    */
-  export type settingsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type SettingsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the settings
+     * Select specific fields to fetch from the Settings
      */
-    select?: settingsSelect<ExtArgs> | null
+    select?: SettingsSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the settings
+     * Omit specific fields from the Settings
      */
-    omit?: settingsOmit<ExtArgs> | null
+    omit?: SettingsOmit<ExtArgs> | null
   }
 
 
@@ -15513,8 +15513,8 @@ export namespace Prisma {
   export const SettingsScalarFieldEnum: {
     type: 'type',
     value: 'value',
-    created_at: 'created_at',
-    updated_at: 'updated_at'
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
@@ -16425,51 +16425,51 @@ export namespace Prisma {
     product_id?: StringWithAggregatesFilter<"wishlist_item"> | string
   }
 
-  export type settingsWhereInput = {
-    AND?: settingsWhereInput | settingsWhereInput[]
-    OR?: settingsWhereInput[]
-    NOT?: settingsWhereInput | settingsWhereInput[]
-    type?: StringFilter<"settings"> | string
-    value?: JsonFilter<"settings">
-    created_at?: DateTimeFilter<"settings"> | Date | string
-    updated_at?: DateTimeFilter<"settings"> | Date | string
+  export type SettingsWhereInput = {
+    AND?: SettingsWhereInput | SettingsWhereInput[]
+    OR?: SettingsWhereInput[]
+    NOT?: SettingsWhereInput | SettingsWhereInput[]
+    type?: StringFilter<"Settings"> | string
+    value?: JsonFilter<"Settings">
+    createdAt?: DateTimeFilter<"Settings"> | Date | string
+    updatedAt?: DateTimeFilter<"Settings"> | Date | string
   }
 
-  export type settingsOrderByWithRelationInput = {
+  export type SettingsOrderByWithRelationInput = {
     type?: SortOrder
     value?: SortOrder
-    created_at?: SortOrder
-    updated_at?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
-  export type settingsWhereUniqueInput = Prisma.AtLeast<{
+  export type SettingsWhereUniqueInput = Prisma.AtLeast<{
     type?: string
-    AND?: settingsWhereInput | settingsWhereInput[]
-    OR?: settingsWhereInput[]
-    NOT?: settingsWhereInput | settingsWhereInput[]
-    value?: JsonFilter<"settings">
-    created_at?: DateTimeFilter<"settings"> | Date | string
-    updated_at?: DateTimeFilter<"settings"> | Date | string
+    AND?: SettingsWhereInput | SettingsWhereInput[]
+    OR?: SettingsWhereInput[]
+    NOT?: SettingsWhereInput | SettingsWhereInput[]
+    value?: JsonFilter<"Settings">
+    createdAt?: DateTimeFilter<"Settings"> | Date | string
+    updatedAt?: DateTimeFilter<"Settings"> | Date | string
   }, "type" | "type">
 
-  export type settingsOrderByWithAggregationInput = {
+  export type SettingsOrderByWithAggregationInput = {
     type?: SortOrder
     value?: SortOrder
-    created_at?: SortOrder
-    updated_at?: SortOrder
-    _count?: settingsCountOrderByAggregateInput
-    _max?: settingsMaxOrderByAggregateInput
-    _min?: settingsMinOrderByAggregateInput
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SettingsCountOrderByAggregateInput
+    _max?: SettingsMaxOrderByAggregateInput
+    _min?: SettingsMinOrderByAggregateInput
   }
 
-  export type settingsScalarWhereWithAggregatesInput = {
-    AND?: settingsScalarWhereWithAggregatesInput | settingsScalarWhereWithAggregatesInput[]
-    OR?: settingsScalarWhereWithAggregatesInput[]
-    NOT?: settingsScalarWhereWithAggregatesInput | settingsScalarWhereWithAggregatesInput[]
-    type?: StringWithAggregatesFilter<"settings"> | string
-    value?: JsonWithAggregatesFilter<"settings">
-    created_at?: DateTimeWithAggregatesFilter<"settings"> | Date | string
-    updated_at?: DateTimeWithAggregatesFilter<"settings"> | Date | string
+  export type SettingsScalarWhereWithAggregatesInput = {
+    AND?: SettingsScalarWhereWithAggregatesInput | SettingsScalarWhereWithAggregatesInput[]
+    OR?: SettingsScalarWhereWithAggregatesInput[]
+    NOT?: SettingsScalarWhereWithAggregatesInput | SettingsScalarWhereWithAggregatesInput[]
+    type?: StringWithAggregatesFilter<"Settings"> | string
+    value?: JsonWithAggregatesFilter<"Settings">
+    createdAt?: DateTimeWithAggregatesFilter<"Settings"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Settings"> | Date | string
   }
 
   export type usersCreateInput = {
@@ -17215,53 +17215,53 @@ export namespace Prisma {
     product_id?: StringFieldUpdateOperationsInput | string
   }
 
-  export type settingsCreateInput = {
+  export type SettingsCreateInput = {
     type: string
     value: JsonNullValueInput | InputJsonValue
-    created_at?: Date | string
-    updated_at?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type settingsUncheckedCreateInput = {
+  export type SettingsUncheckedCreateInput = {
     type: string
     value: JsonNullValueInput | InputJsonValue
-    created_at?: Date | string
-    updated_at?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type settingsUpdateInput = {
+  export type SettingsUpdateInput = {
     type?: StringFieldUpdateOperationsInput | string
     value?: JsonNullValueInput | InputJsonValue
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type settingsUncheckedUpdateInput = {
+  export type SettingsUncheckedUpdateInput = {
     type?: StringFieldUpdateOperationsInput | string
     value?: JsonNullValueInput | InputJsonValue
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type settingsCreateManyInput = {
+  export type SettingsCreateManyInput = {
     type: string
     value: JsonNullValueInput | InputJsonValue
-    created_at?: Date | string
-    updated_at?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type settingsUpdateManyMutationInput = {
+  export type SettingsUpdateManyMutationInput = {
     type?: StringFieldUpdateOperationsInput | string
     value?: JsonNullValueInput | InputJsonValue
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type settingsUncheckedUpdateManyInput = {
+  export type SettingsUncheckedUpdateManyInput = {
     type?: StringFieldUpdateOperationsInput | string
     value?: JsonNullValueInput | InputJsonValue
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -17950,23 +17950,23 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type settingsCountOrderByAggregateInput = {
+  export type SettingsCountOrderByAggregateInput = {
     type?: SortOrder
     value?: SortOrder
-    created_at?: SortOrder
-    updated_at?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
-  export type settingsMaxOrderByAggregateInput = {
+  export type SettingsMaxOrderByAggregateInput = {
     type?: SortOrder
-    created_at?: SortOrder
-    updated_at?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
-  export type settingsMinOrderByAggregateInput = {
+  export type SettingsMinOrderByAggregateInput = {
     type?: SortOrder
-    created_at?: SortOrder
-    updated_at?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> = 
     | PatchUndefined<

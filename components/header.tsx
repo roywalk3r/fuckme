@@ -8,18 +8,32 @@ import { ModeToggle } from "./theme-toggle"
 import { SignedOut, SignInButton, SignedIn, UserButton } from "@clerk/nextjs"
 import { LayoutDashboard } from "lucide-react"
 import { useApi } from "@/lib/hooks/use-api"
+import { cn } from "@/lib/utils"
 
 export default function Header() {
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
   return (
-    <header className="sticky top-0 z-50 w-full wrap flex justify-around border-b bg-background">
-      <div className="container flex h-16 items-center">
+    <header
+    className={cn(
+      "sticky top-0 z-50 w-full transition-all duration-200",
+      isScrolled ? "bg-background/80 backdrop-blur-md border-b shadow-sm" : "bg-background",
+    )}
+  >      <div className="container flex h-16 items-center space-x-2">
         <div className="md:hidden">
           <MobileNav />
         </div>
-        <Link href="/" className="mr-6 flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2">
           <ShoppingBag className="h-6 w-6" />
-          <span className="hidden font-bold sm:inline-block">ACME Store</span>
-        </Link>
+            <span className="text-xl font-bold tracking-tight">TESE</span>
+          </Link>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
           <Link href="/" className="transition-colors hover:text-foreground/80">
             Home

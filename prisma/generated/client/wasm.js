@@ -221,8 +221,8 @@ exports.Prisma.Wishlist_itemScalarFieldEnum = {
 exports.Prisma.SettingsScalarFieldEnum = {
   type: 'type',
   value: 'value',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -286,7 +286,7 @@ exports.Prisma.ModelName = {
   shipping_address: 'shipping_address',
   wishlist: 'wishlist',
   wishlist_item: 'wishlist_item',
-  settings: 'settings'
+  Settings: 'Settings'
 };
 
 /**

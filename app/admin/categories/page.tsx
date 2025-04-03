@@ -41,6 +41,7 @@ export default function AdminCategoriesPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [categoryToDelete, setCategoryToDelete] = useState<any>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const [isDeletingCategory, setIsDeletingCategory] = useState(false)
 
   // Fetch categories
   const { data, isLoading, refetch } = useApi<any>("/api/categories")
@@ -70,23 +71,6 @@ export default function AdminCategoriesPage() {
       toast.error(`Error updating category: ${error}`)
     },
   })
-
-  // Delete category mutation
-  const { mutate: deleteCategory, isLoading: isDeletingCategory } = useApiMutation(
-    "/api/categories",
-    "DELETE",
-    {
-      onSuccess: () => {
-        toast.success("Category deleted successfully")
-        refetch()
-        setCategoryToDelete(null)
-      },
-      onError: (error) => {
-        toast.error(`Error deleting category: ${error}`)
-      },
-    }
-  )
-  
 
   // Create form
   const createForm = useForm<CategoryFormValues>({
@@ -140,8 +124,29 @@ export default function AdminCategoriesPage() {
   }
 
   // Handle delete category
-  const handleDeleteCategory = (id: string) => {
-    deleteCategory(id)
+  const handleDeleteCategory = async (id: string) => {
+    try {
+      setIsDeletingCategory(true)
+      const response = await fetch(`/api/categories?id=${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to delete category")
+      }
+
+      toast.success("Category deleted successfully")
+      refetch()
+      setCategoryToDelete(null)
+    } catch (error) {
+      toast.error(`Error deleting category: ${error instanceof Error ? error.message : String(error)}`)
+    } finally {
+      setIsDeletingCategory(false)
+    }
   }
 
   // Generate slug from name

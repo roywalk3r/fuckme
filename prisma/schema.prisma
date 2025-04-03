@@ -32,7 +32,7 @@ model product {
   created_at     DateTime        @default(now())
   updated_at     DateTime        @updatedAt
   order_items    order_item[]
-  category       category        @relation(fields: [category_id], references: [id])
+  category       category        @relation(fields: [category_id], references: [id], onDelete: Cascade)
   reviews        review[]
   wishlist_items wishlist_item[]
 }
@@ -55,7 +55,7 @@ model order {
   payment_status payment_status    @default(unpaid)
   created_at     DateTime          @default(now())
   updated_at     DateTime          @updatedAt
-  user           users             @relation(fields: [user_id], references: [id])
+  user           users             @relation(fields: [user_id], references: [id], onDelete: Cascade)
   order_items    order_item[]
   payment        payment?
   shipping       shipping_address?
@@ -67,8 +67,8 @@ model order_item {
   product_id String
   quantity   Int
   price      Decimal
-  order      order   @relation(fields: [order_id], references: [id])
-  product    product @relation(fields: [product_id], references: [id])
+  order      order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product    product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 }
 
 model payment {
@@ -78,7 +78,7 @@ model payment {
   payment_status payment_status @default(unpaid)
   transaction_id String?
   created_at     DateTime       @default(now())
-  order          order          @relation(fields: [order_id], references: [id])
+  order          order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
 }
 
 model review {
@@ -88,8 +88,8 @@ model review {
   rating     Int
   comment    String?
   created_at DateTime @default(now())
-  product    product  @relation(fields: [product_id], references: [id])
-  user       users    @relation(fields: [user_id], references: [id])
+  product    product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  user       users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model address {
@@ -102,7 +102,7 @@ model address {
   zip_code  String
   country   String
   phone     String
-  user      users  @relation(fields: [user_id], references: [id])
+  user      users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model shipping_address {
@@ -115,13 +115,13 @@ model shipping_address {
   zip_code  String
   country   String
   phone     String
-  order     order  @relation(fields: [order_id], references: [id])
+  order     order  @relation(fields: [order_id], references: [id], onDelete: Cascade)
 }
 
 model wishlist {
   id      String          @id @default(cuid())
   user_id String          @unique
-  user    users           @relation(fields: [user_id], references: [id])
+  user    users           @relation(fields: [user_id], references: [id], onDelete: Cascade)
   items   wishlist_item[]
 }
 
@@ -129,11 +129,12 @@ model wishlist_item {
   id          String   @id @default(cuid())
   wishlist_id String
   product_id  String
-  product     product  @relation(fields: [product_id], references: [id])
-  wishlist    wishlist @relation(fields: [wishlist_id], references: [id])
+  product     product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  wishlist    wishlist @relation(fields: [wishlist_id], references: [id], onDelete: Cascade)
 }
+
 model Settings {
-  type      String   @id
+  type      String   @id @unique
   value     Json
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
