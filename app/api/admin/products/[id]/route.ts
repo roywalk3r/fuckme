@@ -1,10 +1,10 @@
-import type { NextRequest } from "next/server"
+import { NextResponse, type NextRequest } from "next/server"
 import prisma from "@/lib/prisma"
 import { createApiResponse, handleApiError } from "@/lib/api-utils"
 import { adminAuthMiddleware } from "@/lib/admin-auth"
+import { getCache, setCache, deleteCache } from "@/lib/redis"
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  // Check admin authorization
   const authResponse = await adminAuthMiddleware(req)
   if (authResponse.status !== 200) {
     return authResponse
@@ -12,9 +12,15 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
   try {
     const productId = params.id
-    console.log(`Fetching product with ID: ${productId}`)
+    const cacheKey = `product:${productId}`
 
-    // Get product details
+    // 🔹 Attempt to fetch from Redis cache
+    const cachedProduct = await getCache(cacheKey)
+    if (cachedProduct) {
+      return NextResponse.json({ data: cachedProduct, cached: true })
+    }
+
+    // 🔹 Fetch from DB if not in cache
     const product = await prisma.product.findUnique({
       where: { id: productId },
       include: {
@@ -22,15 +28,15 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       },
     })
 
-    console.log(`Product found:`, product)
-
     if (!product) {
-      console.log(`Product not found with ID: ${productId}`)
       return createApiResponse({
         error: "Product not found",
         status: 404,
       })
     }
+
+    // 🔹 Store in cache for 5 minutes (300 seconds)
+    await setCache(cacheKey, product, 300)
 
     return createApiResponse({
       data: product,
@@ -41,8 +47,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     return handleApiError(error)
   }
 }
+
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  // Check admin authorization
   const authResponse = await adminAuthMiddleware(req)
   if (authResponse.status !== 200) {
     return authResponse
@@ -50,15 +56,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
   try {
     const productId = params.id
-    const body = await req.json()
+    const data = await req.json()
+    const cacheKey = `product:${productId}`
 
-    console.log(`Updating product with ID: ${productId}`)
-    console.log("Update data:", body)
-
-    // Fetch the existing product
     const existingProduct = await prisma.product.findUnique({
       where: { id: productId },
-      select: { category_id: true }, // Get current category_id
     })
 
     if (!existingProduct) {
@@ -68,20 +70,24 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       })
     }
 
-    // Update product while preserving the existing category_id if none is provided
     const updatedProduct = await prisma.product.update({
       where: { id: productId },
       data: {
-        name: body.name,
-        description: body.description,
-        price: body.price,
-        stock: body.stock,
-        category_id: body.category_id || existingProduct.category_id, // Keep existing category if not changed
-        images: body.images,
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        stock: data.stock,
+        categoryId: data.category_id,
+        images: data.images,
+        updatedAt: new Date(),
+      },
+      include: {
+        category: true,
       },
     })
 
-    console.log(`Product updated successfully:`, updatedProduct)
+    // 🔹 Update cache with new product data
+    await setCache(cacheKey, updatedProduct, 300)
 
     return createApiResponse({
       data: updatedProduct,
@@ -94,7 +100,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  // Check admin authorization
   const authResponse = await adminAuthMiddleware(req)
   if (authResponse.status !== 200) {
     return authResponse
@@ -102,8 +107,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
   try {
     const productId = params.id
+    const cacheKey = `product:${productId}`
 
-    // Check if product exists
     const existingProduct = await prisma.product.findUnique({
       where: { id: productId },
     })
@@ -115,17 +120,19 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       })
     }
 
-    // Delete product
     await prisma.product.delete({
       where: { id: productId },
     })
+
+    // 🔹 Invalidate the cache after deletion
+    await deleteCache(cacheKey)
 
     return createApiResponse({
       data: { message: "Product deleted successfully" },
       status: 200,
     })
   } catch (error) {
+    console.error(`Error deleting product with ID ${params.id}:`, error)
     return handleApiError(error)
   }
 }
-

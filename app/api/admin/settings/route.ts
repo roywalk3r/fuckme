@@ -45,22 +45,22 @@ export async function GET(req: NextRequest) {
         for (const setting of settings) {
           try {
             if (
-              setting.type &&
-              (setting.type === "seo" ||
-                setting.type === "general" ||
-                setting.type === "social" ||
-                setting.type === "email" ||
-                setting.type === "theme")
+              setting.key &&
+                 (setting.key === "seo" ||
+                setting.key === "general" ||
+                setting.key === "social" ||
+                setting.key === "email" ||
+                setting.key === "theme")
             ) {
               // Ensure value is properly parsed
               const parsedValue = safeJsonParse(setting.value)
               if (parsedValue) {
-                formattedSettings[setting.type] = parsedValue
-                console.log(`Successfully loaded ${setting.type} settings`)
+                formattedSettings[setting.key] = parsedValue
+                console.log(`Successfully loaded ${setting.key} settings`)
               }
             }
           } catch (e) {
-            console.error(`Error processing setting ${setting.type}:`, e)
+            console.error(`Error processing setting ${setting.key}:`, e)
             // Continue with other settings even if one fails
           }
         }
@@ -149,13 +149,14 @@ export async function POST(req: NextRequest) {
 
     try {
       // Upsert settings
+      const key = type
       const settings = await prisma.settings.upsert({
-        where: { type },
+        where: { key },
         update: { value: validatedData },
-        create: { type, value: validatedData },
+        create: { key, value: validatedData },
       })
 
-      console.log(`Successfully updated ${type} settings`)
+      console.log(`Successfully updated ${key} settings`)
 
       return createApiResponse({
         data: settings,

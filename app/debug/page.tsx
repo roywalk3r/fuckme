@@ -1,3 +1,4 @@
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:2479600482.
 import prisma from "@/lib/prisma"
 export default async function Debug() {
   const users = await prisma.users.findMany({})

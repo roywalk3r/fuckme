@@ -10,7 +10,7 @@ const productSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   price: z.number().positive("Price must be positive"),
   stock: z.number().int().nonnegative("Stock cannot be negative"),
-  category_id: z.string().min(1, "Category is required"),
+  categoryId: z.string().min(1, "Category is required"),
   images: z.array(z.string().url("Invalid image URL")).min(1, "At least one image is required"),
 })
 

@@ -30,17 +30,17 @@ export default function OrdersPage() {
     try {
       const response = await fetch(`/api/admin/orders${queryString}`)
       const data = await response.json()
-console.log(data)
+      console.log(data)
       if (data.data.orders) {
         setOrders(data.data.orders)
       } else {
-        toast.error( "Error",{
+        toast.error("Error", {
           description: "Failed to load orders",
         })
       }
     } catch (error) {
       console.error("Error fetching orders:", error)
-      toast.error( "Error",{
+      toast.error("Error", {
         description: "Failed to load orders",
       })
     } finally {
@@ -264,7 +264,7 @@ console.log(data)
                 {orders.map((order) => (
                   <TableRow key={order.id}>
                     <TableCell className="font-medium">#{order.id.substring(0, 8)}</TableCell>
-                    <TableCell>{formatDate(order.created_at)}</TableCell>
+                    <TableCell>{formatDate(order.createdAt)}</TableCell>
                     <TableCell>{order.user?.email || "N/A"}</TableCell>
                     <TableCell>
                       <Badge className={getStatusColor(order.status)}>
@@ -272,11 +272,11 @@ console.log(data)
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getPaymentStatusColor(order.payment_status)}>
-                        {order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)}
+                      <Badge className={getPaymentStatusColor(order.paymentStatus)}>
+                        {order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">{formatCurrency(Number(order.total_amount))}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(Number(order.totalAmount))}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="outline" size="sm" onClick={() => router.push(`/admin/orders/${order.id}`)}>
                         View
@@ -292,4 +292,3 @@ console.log(data)
     </div>
   )
 }
-

@@ -7,11 +7,10 @@ import { useApiMutation } from "@/lib/hooks/use-api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 export default function AdminSeedPage() {
   const router = useRouter()
-  const { toast } = useToast()
   const [isConfirming, setIsConfirming] = useState(false)
 
   // Seed database mutation
@@ -22,17 +21,14 @@ export default function AdminSeedPage() {
     isSuccess,
   } = useApiMutation("/api/admin/seed", "POST", {
     onSuccess: () => {
-      toast({
-        title: "Database seeded successfully",
+      toast.error( "Database seeded successfully",{
         description: "Sample data has been added to your database.",
       })
     },
     onError: (error) => {
-      toast({
-        title: "Error seeding database",
-        description: error,
-        variant: "destructive",
-      })
+      toast.error( "Error seeding database",{
+        description: error 
+          })
     },
   })
 

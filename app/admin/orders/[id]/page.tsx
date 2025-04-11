@@ -10,11 +10,11 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
-
+import type {Order} from "@/types/product"
 export default function OrderDetailsPage() {
   const { id } = useParams()
   const router = useRouter()
-  const [order, setOrder] = useState<any>(null)
+  const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
   const [status, setStatus] = useState("")
@@ -25,11 +25,11 @@ export default function OrderDetailsPage() {
       try {
         const response = await fetch(`/api/admin/orders/${id}`)
         const data = await response.json()
-
-        if (data.order) {
-          setOrder(data.order)
-          setStatus(data.order.status)
-          setPaymentStatus(data.order.payment_status)
+          console.log(data.data)
+        if (data.data) {
+          setOrder(data.data)
+          setStatus(data.data.status)
+          setPaymentStatus(data.data.paymentStatus)
         } else {
           toast.error( "Error",{
             description: "Failed to load order details",
@@ -60,23 +60,24 @@ export default function OrderDetailsPage() {
         },
         body: JSON.stringify({
           status,
-          payment_status: paymentStatus,
+          paymentStatus: paymentStatus,
         }),
       })
 
       const data = await response.json()
-
       if (data.success) {
         toast.success("Success",{
           description: "Order status updated successfully",
         })
         // Update the local order state with the new status
-        setOrder({
-          ...order,
-          status,
-          payment_status: paymentStatus,
-        })
-      } else {
+        setOrder(prev => ({
+          ...(prev as Order),
+          status: 'confirmed',
+          paymentStatus: 'paid',
+        }));
+        
+
+      } else  {
         toast.error( "Error",{
           description: data.message || "Failed to update order status",
         })
@@ -174,18 +175,18 @@ export default function OrderDetailsPage() {
                 <div>
                   <h3 className="font-semibold text-sm text-muted-foreground">Current Status</h3>
                   <Badge className={getStatusColor(order.status)}>
-                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                    {order.status?.charAt(0).toUpperCase() + order.status.slice(1)}
                   </Badge>
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm text-muted-foreground">Payment Status</h3>
-                  <Badge className={getPaymentStatusColor(order.payment_status)}>
-                    {order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)}
+                  <Badge className={getPaymentStatusColor(order.paymentStatus)}>
+                    {order.paymentStatus?.charAt(0).toUpperCase() + order?.paymentStatus.slice(1)}
                   </Badge>
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm text-muted-foreground">Total Amount</h3>
-                  <p className="font-medium">{formatCurrency(Number(order.total_amount))}</p>
+                  <p className="font-medium">{formatCurrency(Number(order?.totalAmount))}</p>
                 </div>
               </div>
 
@@ -203,7 +204,7 @@ export default function OrderDetailsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {order.order_items?.map((item: any) => (
+                    {order?.orderItems?.map((item: any) => (
                       <TableRow key={item.id}>
                         <TableCell>{item.product?.name || "Product"}</TableCell>
                         <TableCell className="text-right">{formatCurrency(Number(item.price))}</TableCell>
@@ -246,13 +247,13 @@ export default function OrderDetailsPage() {
             <CardContent>
               {order.shipping ? (
                 <div className="space-y-2">
-                  <p>{order.shipping.full_name}</p>
-                  <p>{order.shipping.street}</p>
+                  <p>{order.shippingAddress?.fullName}</p>
+                  <p>{order.shippingAddress?.street}</p>
                   <p>
-                    {order.shipping.city}, {order.shipping.state} {order.shipping.zip_code}
+                    {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zipCode}
                   </p>
-                  <p>{order.shipping.country}</p>
-                  <p>Phone: {order.shipping.phone}</p>
+                  <p>{order.shippingAddress?.country}</p>
+                  <p>Phone: {order.shippingAddress?.phone}</p>
                 </div>
               ) : (
                 <p>No shipping information available</p>
@@ -298,7 +299,7 @@ export default function OrderDetailsPage() {
                 <Button
                   className="w-full"
                   onClick={updateOrderStatus}
-                  disabled={updating || (status === order.status && paymentStatus === order.payment_status)}
+                  disabled={updating || (status === order.status && paymentStatus === order.paymentStatus)}
                 >
                   {updating ? (
                     <>
@@ -317,4 +318,3 @@ export default function OrderDetailsPage() {
     </div>
   )
 }
-

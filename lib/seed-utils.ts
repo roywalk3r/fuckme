@@ -9,11 +9,11 @@ const prisma = new PrismaClient()
 export async function seedDatabase() {
   try {
     // Clean up existing data
-    await prisma.wishlist_item.deleteMany({})
+    await prisma.wishlistItem.deleteMany({})
     await prisma.wishlist.deleteMany({})
     await prisma.payment.deleteMany({})
-    await prisma.shipping_address.deleteMany({})
-    await prisma.order_item.deleteMany({})
+    await prisma.shippingAddress.deleteMany({})
+    await prisma.orderItem.deleteMany({})
     await prisma.order.deleteMany({})
     await prisma.review.deleteMany({})
     await prisma.address.deleteMany({})
@@ -145,7 +145,8 @@ export async function seedDatabase() {
             price: product.price,
             stock: product.stock,
             images: product.images,
-            category_id: product.category_id,
+            categoryId: product.category_id,
+            slug: product.name.toLowerCase().replace(/ /g, "-"),
           },
         }),
       ),

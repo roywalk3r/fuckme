@@ -3,20 +3,29 @@ import { ZodError } from "zod"
 
 type ApiResponse<T> = {
   data?: T
-  error?: string | string[] | Record<string, string[]>
-  status: number
+  error?: string | string[] | Record<string, string[]> | null
+  status?: number
 }
 
 export function createApiResponse<T>(response: ApiResponse<T>): NextResponse {
   const { data, error, status } = response
 
-  // Convert BigInt to Number before returning the JSON response
-  const serializeData = JSON.parse(
-    JSON.stringify(data, (_, value) => (typeof value === "bigint" ? Number(value) : value)),
-  )
+  let serializeData: T | null = null
+
+  if (data !== undefined) {
+    try {
+      serializeData = JSON.parse(
+        JSON.stringify(data, (_, value) => (typeof value === "bigint" ? Number(value) : value))
+      )
+    } catch (err) {
+      console.error("Serialization Error:", err)
+      serializeData = null
+    }
+  }
 
   return NextResponse.json({ data: serializeData, error: error || null }, { status })
 }
+
 
 export function handleApiError(error: unknown): NextResponse {
   console.error("API Error:", error)

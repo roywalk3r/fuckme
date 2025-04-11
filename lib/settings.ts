@@ -30,7 +30,7 @@ export async function getSettings(): Promise<Settings> {
       if (settings && settings.length > 0) {
         for (const setting of settings) {
           try {
-            const type = setting.type as keyof Settings
+            const type = setting.key as keyof Settings
             if (type in formattedSettings) {
               const parsedValue = safeJsonParse(setting.value)
               if (parsedValue) {
@@ -38,7 +38,7 @@ export async function getSettings(): Promise<Settings> {
               }
             }
           } catch (e) {
-            console.error(`Error parsing setting ${setting.type}:`, e)
+            console.error(`Error parsing setting ${setting.key}:`, e)
             // Continue with other settings
           }
         }
@@ -66,7 +66,7 @@ export async function getSettingsByType<T extends keyof Settings>(type: T): Prom
     try {
       // Get setting from database
       const setting = await prisma.settings.findUnique({
-        where: { type },
+        where: { key: type },
       })
 
       // Return setting value or default
@@ -94,10 +94,11 @@ export async function getSettingsByType<T extends keyof Settings>(type: T): Prom
 export async function updateSettings<T extends keyof Settings>(type: T, data: Settings[T]): Promise<boolean> {
   try {
     // Upsert setting
+    const key = type
     await prisma.settings.upsert({
-      where: { type },
+      where: { key },
       update: { value: data as any },
-      create: { type, value: data as any },
+      create: { key, value: data as any },
     })
 
     return true

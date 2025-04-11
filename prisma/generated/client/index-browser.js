@@ -17,12 +17,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.5.0
- * Query Engine version: 173f8d54f8d52e692c7e27e72a88314ec7aeff60
+ * Prisma Client JS version: 6.6.0
+ * Query Engine version: f676762280b54cd07c770017ed3711ddde35f37a
  */
 Prisma.prismaVersion = {
-  client: "6.5.0",
-  engine: "173f8d54f8d52e692c7e27e72a88314ec7aeff60"
+  client: "6.6.0",
+  engine: "f676762280b54cd07c770017ed3711ddde35f37a"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -117,25 +117,42 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.UsersScalarFieldEnum = {
+exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
   email: 'email',
   role: 'role',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ProductScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  slug: 'slug',
   description: 'description',
   price: 'price',
+  comparePrice: 'comparePrice',
+  sku: 'sku',
   stock: 'stock',
-  category_id: 'category_id',
+  categoryId: 'categoryId',
   images: 'images',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
+  isDeleted: 'isDeleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ProductVariantScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  name: 'name',
+  sku: 'sku',
+  price: 'price',
+  stock: 'stock',
+  attributes: 'attributes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.CategoryScalarFieldEnum = {
@@ -143,86 +160,141 @@ exports.Prisma.CategoryScalarFieldEnum = {
   name: 'name',
   slug: 'slug',
   image: 'image',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
+  description: 'description',
+  parentId: 'parentId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.OrderScalarFieldEnum = {
   id: 'id',
-  user_id: 'user_id',
+  userId: 'userId',
   status: 'status',
-  total_amount: 'total_amount',
-  payment_status: 'payment_status',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
+  totalAmount: 'totalAmount',
+  subtotal: 'subtotal',
+  tax: 'tax',
+  shipping: 'shipping',
+  discount: 'discount',
+  paymentStatus: 'paymentStatus',
+  couponId: 'couponId',
+  trackingNumber: 'trackingNumber',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
-exports.Prisma.Order_itemScalarFieldEnum = {
+exports.Prisma.OrderItemScalarFieldEnum = {
   id: 'id',
-  order_id: 'order_id',
-  product_id: 'product_id',
+  orderId: 'orderId',
+  productId: 'productId',
+  variantId: 'variantId',
   quantity: 'quantity',
   price: 'price'
 };
 
 exports.Prisma.PaymentScalarFieldEnum = {
   id: 'id',
-  order_id: 'order_id',
-  payment_method: 'payment_method',
-  payment_status: 'payment_status',
-  transaction_id: 'transaction_id',
-  created_at: 'created_at'
+  orderId: 'orderId',
+  paymentMethod: 'paymentMethod',
+  paymentStatus: 'paymentStatus',
+  transactionId: 'transactionId',
+  amount: 'amount',
+  currency: 'currency',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ReviewScalarFieldEnum = {
   id: 'id',
-  user_id: 'user_id',
-  product_id: 'product_id',
+  userId: 'userId',
+  productId: 'productId',
   rating: 'rating',
+  title: 'title',
   comment: 'comment',
-  created_at: 'created_at'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.AddressScalarFieldEnum = {
   id: 'id',
-  user_id: 'user_id',
-  full_name: 'full_name',
+  userId: 'userId',
+  fullName: 'fullName',
   street: 'street',
   city: 'city',
   state: 'state',
-  zip_code: 'zip_code',
+  zipCode: 'zipCode',
   country: 'country',
-  phone: 'phone'
+  phone: 'phone',
+  isDefault: 'isDefault'
 };
 
-exports.Prisma.Shipping_addressScalarFieldEnum = {
+exports.Prisma.ShippingAddressScalarFieldEnum = {
   id: 'id',
-  order_id: 'order_id',
-  full_name: 'full_name',
+  orderId: 'orderId',
+  fullName: 'fullName',
   street: 'street',
   city: 'city',
   state: 'state',
-  zip_code: 'zip_code',
+  zipCode: 'zipCode',
   country: 'country',
   phone: 'phone'
 };
 
 exports.Prisma.WishlistScalarFieldEnum = {
   id: 'id',
-  user_id: 'user_id'
+  userId: 'userId'
 };
 
-exports.Prisma.Wishlist_itemScalarFieldEnum = {
+exports.Prisma.WishlistItemScalarFieldEnum = {
   id: 'id',
-  wishlist_id: 'wishlist_id',
-  product_id: 'product_id'
+  wishlistId: 'wishlistId',
+  productId: 'productId',
+  addedAt: 'addedAt'
 };
 
 exports.Prisma.SettingsScalarFieldEnum = {
+  key: 'key',
+  value: 'value',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CouponScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
   type: 'type',
   value: 'value',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
+  minPurchase: 'minPurchase',
+  maxDiscount: 'maxDiscount',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  usageLimit: 'usageLimit',
+  usageCount: 'usageCount',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AuditScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  action: 'action',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  oldValue: 'oldValue',
+  newValue: 'newValue',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RefundScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  amount: 'amount',
+  reason: 'reason',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -231,6 +303,11 @@ exports.Prisma.SortOrder = {
 };
 
 exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 
@@ -249,44 +326,63 @@ exports.Prisma.JsonNullValueFilter = {
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
-exports.user_role = exports.$Enums.user_role = {
+exports.UserRole = exports.$Enums.UserRole = {
   admin: 'admin',
   staff: 'staff',
   customer: 'customer'
 };
 
-exports.order_status = exports.$Enums.order_status = {
+exports.OrderStatus = exports.$Enums.OrderStatus = {
   pending: 'pending',
+  processing: 'processing',
   shipped: 'shipped',
   delivered: 'delivered',
   canceled: 'canceled'
 };
 
-exports.payment_status = exports.$Enums.payment_status = {
+exports.PaymentStatus = exports.$Enums.PaymentStatus = {
   unpaid: 'unpaid',
   paid: 'paid',
-  refunded: 'refunded'
+  partially_refunded: 'partially_refunded',
+  refunded: 'refunded',
+  failed: 'failed'
 };
 
-exports.payment_method = exports.$Enums.payment_method = {
+exports.PaymentMethod = exports.$Enums.PaymentMethod = {
   stripe: 'stripe',
   paypal: 'paypal',
   bank_transfer: 'bank_transfer'
 };
 
+exports.CouponType = exports.$Enums.CouponType = {
+  percentage: 'percentage',
+  fixed_amount: 'fixed_amount'
+};
+
+exports.RefundStatus = exports.$Enums.RefundStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  completed: 'completed',
+  rejected: 'rejected'
+};
+
 exports.Prisma.ModelName = {
-  users: 'users',
-  product: 'product',
-  category: 'category',
-  order: 'order',
-  order_item: 'order_item',
-  payment: 'payment',
-  review: 'review',
-  address: 'address',
-  shipping_address: 'shipping_address',
-  wishlist: 'wishlist',
-  wishlist_item: 'wishlist_item',
-  settings: 'settings'
+  User: 'User',
+  Product: 'Product',
+  ProductVariant: 'ProductVariant',
+  Category: 'Category',
+  Order: 'Order',
+  OrderItem: 'OrderItem',
+  Payment: 'Payment',
+  Review: 'Review',
+  Address: 'Address',
+  ShippingAddress: 'ShippingAddress',
+  Wishlist: 'Wishlist',
+  WishlistItem: 'WishlistItem',
+  Settings: 'Settings',
+  Coupon: 'Coupon',
+  Audit: 'Audit',
+  Refund: 'Refund'
 };
 
 /**
@@ -306,7 +402,7 @@ class PrismaClient {
         } else {
           message = 'PrismaClient is unable to run in this browser environment, or has been bundled for the browser (running in `' + runtime.prettyName + '`).'
         }
-        
+
         message += `
 If this is unexpected, please open an issue: https://pris.ly/prisma-prisma-bug-report`
 

@@ -78,9 +78,9 @@ export default function ProductsPage() {
     applyFilters()
   }
 
-  const handleCategoryChange = (category_id: string) => {
+  const handleCategoryChange = (categoryId: string) => {
     setSelectedCategories((prev) =>
-      prev.includes(category_id) ? prev.filter((id) => id !== category_id) : [...prev, category_id],
+      prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId],
     )
   }
 

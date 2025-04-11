@@ -27,7 +27,7 @@ const productSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   price: z.coerce.number().positive("Price must be positive"),
   stock: z.coerce.number().int().nonnegative("Stock cannot be negative"),
-  category_id: z.string().min(1, "Category is required"),
+  categoryId: z.string().min(1, "Category is required"),
   images: z.array(z.string().url("Invalid image URL")).min(1, "At least one image is required"),
 })
 
@@ -73,7 +73,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       description: "",
       price: 0,
       stock: 0,
-      category_id: "",
+      categoryId: "",
       images: [],
     },
   })
@@ -88,7 +88,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         description: product.description,
         price: product.price,
         stock: product.stock,
-        category_id: product.category_id,
+        categoryId: product.categoryId,
         images: product.images,
       })
       setImageUrls(product.images)
@@ -249,7 +249,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
                   <FormField
                     control={form.control}
-                    name="category_id"
+                    name="categoryId"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Category</FormLabel>

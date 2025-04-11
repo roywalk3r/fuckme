@@ -34,7 +34,7 @@ export default function ProductDetailPage() {
 
         // Fetch related products
         const relatedResponse = await fetch(
-          `/api/products?category=${data.data.category_id}&limit=4&exclude=${data.data.id}`,
+          `/api/products?category=${data.data.categoryId}&limit=4&exclude=${data.data.id}`,
         )
         if (relatedResponse.ok) {
           const relatedData = await relatedResponse.json()

@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     const fullName = `${first_name} ${last_name}` || ""
     try {
       // Update user in database
-      await prisma.users.update({
+      await prisma.user.update({
         where: {
           id,
         },
@@ -70,12 +70,11 @@ export async function POST(req: Request) {
 
     try {
       // Insert user into database
-      await prisma.users.create({
+      await prisma.user.create({
         data: {
           id,
           email,
           name: fullName || "",
-          role: "customer", // Default role
         },
       })
 

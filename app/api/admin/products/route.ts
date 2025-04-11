@@ -1,3 +1,4 @@
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:3997233121.
 import type { NextRequest } from "next/server"
 import prisma from "@/lib/prisma"
 import { createApiResponse, handleApiError } from "@/lib/api-utils"
@@ -11,7 +12,7 @@ const productSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   price: z.number().positive("Price must be positive"),
   stock: z.number().int().nonnegative("Stock cannot be negative"),
-  category_id: z.string().min(1, "Category is required"),
+  categoryId: z.string().min(1, "Category is required"),
   images: z.array(z.string().url("Invalid image URL")).min(1, "At least one image is required"),
 })
 
@@ -57,11 +58,11 @@ export async function GET(req: NextRequest) {
         _count: {
           select: {
             reviews: true,
-            order_items: true,
+            orderItems: true,
           },
         },
       },
-      orderBy: { created_at: "desc" },
+      orderBy: { createdAt: "desc" },
       skip,
       take: limit,
     })
@@ -97,8 +98,9 @@ export async function POST(req: NextRequest) {
         description: validatedData.description,
         price: validatedData.price,
         stock: validatedData.stock,
-        category: { connect: { id: validatedData.category_id } },
+        category: { connect: { id: validatedData.categoryId } },
         images: validatedData.images,
+        slug: validatedData.name.toLowerCase().replace(/ /g, "-"), // Generate slug
       },
       include: { category: true },
     })
@@ -122,7 +124,7 @@ export async function PATCH(req: NextRequest) {
   try {
     // Parse and validate request body
     const body = await req.json()
-    const { id, category_id, ...data } = productSchema.parse(body)
+    const { id, ...data } = productSchema.parse(body)
 
     if (!id) {
       return createApiResponse({
@@ -131,18 +133,17 @@ export async function PATCH(req: NextRequest) {
       })
     }
 
-    // Build update object
-    const updateData: any = { ...data }
-
-    // If category_id is provided, update the category relation
-    if (category_id) {
-      updateData.category = { connect: { id: category_id } }
-    }
-
     // Update product
     const product = await prisma.product.update({
       where: { id },
-      data: updateData,
+      data: {
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        stock: data.stock,
+        category: { connect: { id: data.categoryId } },
+        images: data.images,
+      },
       include: { category: true },
     })
 
@@ -154,7 +155,6 @@ export async function PATCH(req: NextRequest) {
     return handleApiError(error)
   }
 }
-
 
 export async function DELETE(req: NextRequest) {
   // Check admin authorization

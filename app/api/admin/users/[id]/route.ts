@@ -11,7 +11,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     }
 
     // Check if the current user is an admin
-    const currentUser = await prisma.users.findUnique({
+    const currentUser = await prisma.user.findUnique({
       where: { id: userId },
       select: { role: true },
     })
@@ -24,13 +24,13 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     const { role } = await request.json()
 
     // Validate role
-    const validRoles = ["ADMIN", "STAFF", "CUSTOMER"]
+    const validRoles = ["admin", "staff", "customer"]
     if (!validRoles.includes(role)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 })
     }
 
     // Update user role
-    await prisma.users.update({
+    await prisma.user.update({
       where: { id },
       data: { role },
     })

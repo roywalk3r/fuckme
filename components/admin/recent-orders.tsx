@@ -21,38 +21,35 @@ export default function AdminRecentOrders() {
   }
 
   const recentOrders = data?.recentOrders || []
-console.log("🚀 ~ AdminRecentOrders ~ recentOrders:", recentOrders)
-  const getStatusBadgeVariant = (status: string) => {
+
+  const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "processing":
-        return "secondary"
-      case "shiped":
-        return "success"
+        return "bg-yellow-100 text-yellow-800"
+      case "shipped":
       case "delivered":
-        return "success"
+        return "bg-green-100 text-green-800"
       case "cancelled":
-        return "destructive"
+        return "bg-red-100 text-red-800"
       default:
-        return "outline"
+        return "bg-gray-100 text-gray-800"
     }
   }
 
-  const getPaymentStatusBadgeVariant = (status: string) => {
+  const getPaymentBadgeColor = (status: string) => {
     switch (status) {
       case "paid":
-        return "success"  // Now "success" is a valid variant
+        return "bg-green-100 text-green-800"
       case "pending":
-        return "outline"
+        return "bg-gray-100 text-gray-800"
       case "failed":
-        return "destructive"
+        return "bg-red-100 text-red-800"
       case "refunded":
-        return "secondary"
+        return "bg-blue-100 text-blue-800"
       default:
-        return "outline"
+        return "bg-gray-100 text-gray-800"
     }
   }
-  
-  
 
   return (
     <div>
@@ -81,19 +78,19 @@ console.log("🚀 ~ AdminRecentOrders ~ recentOrders:", recentOrders)
                 <TableCell className="font-medium">{order.id.substring(0, 8)}</TableCell>
                 <TableCell>{order.user?.name || order.user?.email || "N/A"}</TableCell>
                 <TableCell>
-                  <Badge variant={getStatusBadgeVariant(order.status)}>
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(order.status)}`}>
                     <Package className="h-3 w-3 mr-1" />
                     {order.status}
-                  </Badge>
+                  </span>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getPaymentStatusBadgeVariant(order.payment_status)}>
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPaymentBadgeColor(order.paymentStatus)}`}>
                     <CreditCard className="h-3 w-3 mr-1" />
-                    {order.payment_status}
-                  </Badge>
+                    {order.paymentStatus}
+                  </span>
                 </TableCell>
-                <TableCell>${Number(order.total_amount)?.toFixed(2)}</TableCell>
-                <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
+                <TableCell>${Number(order.totalAmount)?.toFixed(2)}</TableCell>
+                <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell>
                   <Button variant="ghost" size="sm">
                     <Eye className="h-4 w-4 mr-1" />
@@ -107,7 +104,7 @@ console.log("🚀 ~ AdminRecentOrders ~ recentOrders:", recentOrders)
       </Table>
     </div>
   )
-
+}
 
 function OrdersLoading() {
   return (
@@ -119,4 +116,4 @@ function OrdersLoading() {
         ))}
     </div>
   )
-}}
+}

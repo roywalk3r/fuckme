@@ -262,4 +262,3 @@ console.log(data)
     </div>
   )
 }
-

@@ -149,10 +149,3 @@ export const defaultSettings: Settings = {
   },
 }
 
-/**
- * Returns a fresh copy of the default settings
- */
-export function getDefaultSettings(): Settings {
-  return JSON.parse(JSON.stringify(defaultSettings))
-}
-

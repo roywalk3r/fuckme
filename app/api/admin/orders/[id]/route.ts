@@ -1,17 +1,23 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import type { NextRequest } from "next/server"
+import prisma from "@/lib/prisma"
+import { createApiResponse, handleApiError } from "@/lib/api-utils"
 import { adminAuthMiddleware } from "@/lib/admin-auth"
+import { z } from "zod"
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+// Validation schema for order status update
+const updateOrderSchema = z.object({
+  status: z.enum(["pending", "processing", "shipped", "delivered", "canceled"]).optional(),
+  payment_status: z.enum(["unpaid", "paid", "refunded"]).optional(),
+})
+
+export async function GET(req: NextRequest, context: { params: { id: string } }) {
+
+
   try {
-    // Check admin authentication
-     const authResponse = await adminAuthMiddleware(request)
-    if (authResponse.status !== 200) {
-      return authResponse
-    }
-    const orderId = params.id
+    // const orderId = await params.id
+    const orderId = context.params.id  // Check admin authorization
 
-    // Fetch the order with related data
+    // Get order with related data
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: {
@@ -22,62 +28,81 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             email: true,
           },
         },
-        order_items: {
+        orderItems: {
           include: {
             product: {
               select: {
                 id: true,
                 name: true,
-                price: true,
                 images: true,
               },
             },
           },
         },
+        shippingAddress: true,
         payment: true,
-        shipping: true,
       },
     })
 
     if (!order) {
-      return NextResponse.json({ success: false, message: "Order not found" }, { status: 404 })
+      return createApiResponse({
+        error: "Order not found",
+        status: 404,
+      })
     }
 
-    return NextResponse.json({ success: true, order })
+    return createApiResponse({
+      data: order,
+      status: 200,
+    })
   } catch (error) {
-    console.error("Error fetching order:", error)
-    return NextResponse.json({ success: false, message: "Failed to fetch order" }, { status: 500 })
+    return handleApiError(error)
   }
 }
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    // Check admin authentication
-    const authResponse = await adminAuthMiddleware(request)
-    if (authResponse.status !== 200) {
-      return authResponse
-    }
-    const orderId = params.id
-    const { status, payment_status } = await request.json()
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  // Check admin authorization
 
-    // Validate input
-    if (!status && !payment_status) {
-      return NextResponse.json({ success: false, message: "No update data provided" }, { status: 400 })
-    }
+
+  try {
+    const orderId = params.id
+    const body = await req.json()
+
+    // Validate request body
+    const validatedData = updateOrderSchema.parse(body)
 
     // Check if order exists
-    const existingOrder = await prisma.order.findUnique({
+    const orderExists = await prisma.order.findUnique({
       where: { id: orderId },
     })
 
-    if (!existingOrder) {
-      return NextResponse.json({ success: false, message: "Order not found" }, { status: 404 })
+    if (!orderExists) {
+      return createApiResponse({
+        error: "Order not found",
+        status: 404,
+      })
     }
 
-    // Prepare update data
+    // Update order status
     const updateData: any = {}
-    if (status) updateData.status = status
-    if (payment_status) updateData.payment_status = payment_status
+    if (validatedData.status) {
+      updateData.status = validatedData.status
+    }
+    if (validatedData.payment_status) {
+      updateData.payment_status = validatedData.payment_status
+
+      // Also update payment status if payment exists
+      const payment = await prisma.payment.findUnique({
+        where: {  orderId },
+      })
+
+      if (payment) {
+        await prisma.payment.update({
+          where: { id: payment.id },
+          data: { paymentStatus: validatedData.payment_status },
+        })
+      }
+    }
 
     // Update order
     const updatedOrder = await prisma.order.update({
@@ -85,22 +110,12 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       data: updateData,
     })
 
-    // If payment status is updated, also update the payment record
-    if (payment_status) {
-      await prisma.payment.updateMany({
-        where: { order_id: orderId },
-        data: { payment_status },
-      })
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Order updated successfully",
-      order: updatedOrder,
+    return createApiResponse({
+      data: updatedOrder,
+      status: 200,
     })
   } catch (error) {
-    console.error("Error updating order:", error)
-    return NextResponse.json({ success: false, message: "Failed to update order" }, { status: 500 })
+    return handleApiError(error)
   }
 }
 

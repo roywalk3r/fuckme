@@ -24,7 +24,7 @@ export default async function AdminLayout({
 
     try {
       // First try with the new snake_case schema
-      const user = await prisma.users.findUnique({
+      const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { role: true },
       })

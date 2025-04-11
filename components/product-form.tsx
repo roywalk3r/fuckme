@@ -25,7 +25,7 @@ const productSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   price: z.coerce.number().positive("Price must be positive"),
   stock: z.coerce.number().int().nonnegative("Stock cannot be negative"),
-  category_id: z.string().min(1, "Category is required"),
+  categoryId: z.string().min(1, "Category is required"),
   images: z.array(z.string().url("Invalid image URL")).min(1, "At least one image is required"),
 })
 
@@ -42,20 +42,30 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoadingCategories, setIsLoadingCategories] = useState(true)
+  const [formStatus, setFormStatus] = useState<string>("")
+
+  // Debug logging for initialData
+  useEffect(() => {
+    console.log("ProductForm initialData:", initialData)
+    console.log("isEditing:", isEditing)
+  }, [initialData, isEditing])
 
   // Fetch categories on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        setFormStatus("Fetching categories...")
         const response = await fetch("/api/categories")
         if (!response.ok) {
           throw new Error("Failed to fetch categories")
         }
         const data = await response.json()
         setCategories(data.data || [])
+        setFormStatus("Categories loaded")
       } catch (error) {
         console.error("Error fetching categories:", error)
         toast.error("Failed to load categories")
+        setFormStatus("Failed to load categories")
       } finally {
         setIsLoadingCategories(false)
       }
@@ -71,80 +81,168 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
       id: initialData?.id || undefined,
       name: initialData?.name || "",
       description: initialData?.description || "",
-      price: initialData?.price || 0,
-      stock: initialData?.stock || 0,
-      category_id: initialData?.category_id || "",
+      // Ensure these are properly converted to numbers
+      price: initialData?.price ? Number(initialData.price) : 0,
+      stock: initialData?.stock ? Number(initialData.stock) : 0,
+      categoryId: initialData?.categoryId || "",
       images: initialData?.images || [],
     },
+    mode: "onChange" // Validate on change for better UX
   })
+
+  // Debug logging for form values
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      console.log("Form values changed:", value)
+    })
+    return () => subscription.unsubscribe()
+  }, [form])
 
   // Handle image upload success
   const handleUploadSuccess = (urls: string[]) => {
     console.log("Uploaded image URLs:", urls)
     const updatedImages = [...imageUrls, ...urls]
     setImageUrls(updatedImages)
-    form.setValue("images", updatedImages)
+    form.setValue("images", updatedImages, { shouldValidate: true })
 
     toast.success(`${urls.length} image(s) uploaded successfully.`)
   }
 
   // Handle media library selection
   const handleMediaSelection = (selectedUrls: string[]) => {
+    console.log("Selected media URLs:", selectedUrls)
     const updatedImages = [...imageUrls, ...selectedUrls]
     setImageUrls(updatedImages)
-    form.setValue("images", updatedImages)
+    form.setValue("images", updatedImages, { shouldValidate: true })
   }
 
   // Remove image from the list
   const handleRemoveImage = (index: number) => {
+    console.log("Removing image at index:", index)
     const updatedImages = imageUrls.filter((_, i) => i !== index)
     setImageUrls(updatedImages)
-    form.setValue("images", updatedImages)
+    form.setValue("images", updatedImages, { shouldValidate: true })
   }
 
   // Form submission
   const onSubmit = async (data: ProductFormValues) => {
-    setIsSubmitting(true)
     try {
-      console.log("Submitting product data:", data)
+      setIsSubmitting(true)
+      setFormStatus("Submitting form...")
+      console.log("Form submitted. Data:", data)
+      console.log("Form validation state:", form.formState)
 
-      const endpoint = isEditing ? `/api/admin/products/${initialData?.id}` : "/api/admin/products"
+      // Make sure we're using the correct ID for updates
+      const productId = isEditing ? initialData?.id : data.id
+      
+      if (isEditing && !productId) {
+        const errorMessage = "Product ID is missing for update operation"
+        console.error(errorMessage)
+        toast.error(errorMessage)
+        setFormStatus("Error: Missing product ID")
+        return
+      }
+
+      const endpoint = isEditing ? `/api/admin/products/${productId}` : "/api/admin/products"
       const method = isEditing ? "PATCH" : "POST"
+
+      // Include the ID in the request body for clarity
+      const requestData = {
+        ...data,
+        id: productId
+      }
+
+      console.log(`Sending ${method} request to ${endpoint}:`, requestData)
+      setFormStatus(`Sending ${method} request...`)
 
       const response = await fetch(endpoint, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(requestData),
+        // Prevent caching issues
+        cache: "no-store",
       })
 
-      const responseData = await response.json()
-      console.log("API response:", responseData)
+      console.log("Response status:", response.status)
+      setFormStatus(`Got response: ${response.status}`)
 
-      if (!response.ok) {
-        throw new Error(responseData.error || "Something went wrong")
+      let responseText
+      let responseData
+      
+      try {
+        // First get the raw text to debug any parsing issues
+        responseText = await response.text()
+        console.log("Raw response:", responseText)
+        
+        // Try to parse as JSON if possible
+        try {
+          responseData = JSON.parse(responseText)
+          console.log("Parsed response data:", responseData)
+        } catch (e) {
+          console.log("Response is not valid JSON")
+        }
+      } catch (e) {
+        console.error("Error reading response:", e)
       }
 
+      if (!response.ok) {
+        // Extract error message
+        let errorMessage = "Failed to save product"
+        if (responseData && (responseData.error || responseData.message)) {
+          errorMessage = responseData.error || responseData.message
+        } else {
+          errorMessage = `Error: ${response.status} ${response.statusText}`
+        }
+        
+        throw new Error(errorMessage)
+      }
+
+      setFormStatus("Success!")
       toast.success(isEditing ? "Product updated successfully" : "Product created successfully")
 
       // Add a small delay before navigation to ensure the toast is visible
       setTimeout(() => {
+        console.log("Navigating back to products list")
         router.push("/admin/products")
         router.refresh()
       }, 1000)
     } catch (error) {
       console.error("Error saving product:", error)
+      setFormStatus(`Error: ${error instanceof Error ? error.message : "Unknown error"}`)
       toast.error(error instanceof Error ? error.message : "Failed to save product")
     } finally {
       setIsSubmitting(false)
     }
   }
 
+  // Handler for manual form submission (bypass react-hook-form)
+  const handleManualSubmit = async () => {
+    // Check if the form is valid
+    const isValid = await form.trigger();
+    if (!isValid) {
+      toast.error("Please correct the form errors before submitting");
+      return;
+    }
+
+    // Get current values
+    const formValues = form.getValues();
+    console.log("Manual submit with values:", formValues);
+    
+    // Call the regular submit handler
+    await onSubmit(formValues);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">{isEditing ? "Edit Product" : "Create New Product"}</h1>
+        {formStatus && (
+          <div className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
+            Status: {formStatus}
+          </div>
+        )}
       </div>
 
       <Form {...form}>
@@ -156,6 +254,12 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                 <CardDescription>Enter the basic details of your product.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {isEditing && (
+                  <div className="text-sm bg-muted p-2 rounded mb-4">
+                    Editing product ID: {initialData?.id}
+                  </div>
+                )}
+                
                 <FormField
                   control={form.control}
                   name="name"
@@ -192,7 +296,16 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                       <FormItem>
                         <FormLabel>Price ($)</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.01" min="0" {...field} />
+                          <Input 
+                            type="number" 
+                            step="0.01" 
+                            min="0" 
+                            {...field} 
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.onChange(value === "" ? "" : Number(value));
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -206,7 +319,15 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                       <FormItem>
                         <FormLabel>Stock</FormLabel>
                         <FormControl>
-                          <Input type="number" min="0" {...field} />
+                          <Input 
+                            type="number" 
+                            min="0" 
+                            {...field} 
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.onChange(value === "" ? "" : parseInt(value, 10));
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -215,11 +336,15 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
 
                   <FormField
                     control={form.control}
-                    name="category_id"
+                    name="categoryId"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Category</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          value={field.value || ""}
+                          disabled={isLoadingCategories}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a category" />
@@ -270,7 +395,6 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                             <AppwriteUpload
                               onUploadSuccess={handleUploadSuccess}
                               buttonText="Upload Images"
-                              //   folder="products"
                               multiple={true}
                               acceptedFileTypes="image/*"
                             />
@@ -280,14 +404,13 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                               buttonText="Media Library"
                               maxSelections={10}
                               allowDelete={true}
-                              //   folder="products"
                             />
                           </div>
 
                           {imageUrls.length > 0 ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                               {imageUrls.map((url, index) => (
-                                <div key={index} className="relative group">
+                                <div key={`img-${index}-${url.substring(url.lastIndexOf('/') + 1, url.lastIndexOf('/') + 8)}`} className="relative group">
                                   <div className="aspect-square overflow-hidden rounded-md border">
                                     <AppwriteImage
                                       src={url}
@@ -332,6 +455,8 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
             <Button type="button" variant="outline" onClick={() => router.push("/admin/products")}>
               Cancel
             </Button>
+            
+            {/* Regular submit button */}
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
@@ -345,10 +470,34 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                 </>
               )}
             </Button>
+            
+            {/* Alternative direct submit button for debugging */}
+            <Button 
+              type="button" 
+              onClick={handleManualSubmit} 
+              disabled={isSubmitting}
+              variant="secondary"
+            >
+              Force Submit
+            </Button>
+          </div>
+
+          {/* Debug form state */}
+          <div className="mt-8 p-4 bg-muted rounded-md">
+            <details>
+              <summary className="cursor-pointer text-sm font-medium">Debug Form Information</summary>
+              <div className="mt-2 text-xs">
+                <p>Form dirty: {form.formState.isDirty ? "Yes" : "No"}</p>
+                <p>Form valid: {form.formState.isValid ? "Yes" : "No"}</p>
+                <p>Form errors: {Object.keys(form.formState.errors).length > 0 ? 
+                  JSON.stringify(form.formState.errors) : "None"}</p>
+                <p>Is Editing: {isEditing ? "Yes" : "No"}</p>
+                <p>Product ID: {initialData?.id || "Not set"}</p>
+              </div>
+            </details>
           </div>
         </form>
       </Form>
     </div>
   )
 }
-

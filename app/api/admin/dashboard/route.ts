@@ -4,14 +4,12 @@ import { createApiResponse, handleApiError } from "@/lib/api-utils"
 import { adminAuthMiddleware } from "@/lib/admin-auth"
 
 export async function GET(req: NextRequest) {
-  // Check admin authorization
   const authResponse = await adminAuthMiddleware(req)
   if (authResponse.status !== 200) {
     return authResponse
   }
 
   try {
-    // Fetch statistics
     const [
       totalUsers,
       totalProducts,
@@ -22,33 +20,33 @@ export async function GET(req: NextRequest) {
       usersByRole,
       salesByMonth,
     ] = await Promise.all([
-      prisma.users.count(),
+      prisma.user.count(),
       prisma.product.count(),
       prisma.order.count(),
       prisma.order.aggregate({
         _sum: {
-          total_amount: true,
+          totalAmount: true,
         },
-        where: { payment_status: "paid" },
+        where: { paymentStatus: "paid" },
       }),
       prisma.order.findMany({
         take: 5,
-        orderBy: { created_at: "desc" },
+        orderBy: { createdAt: "desc" },
         include: {
           user: { select: { name: true, email: true } },
         },
       }),
 
       // Top selling products
-      prisma.order_item.groupBy({
-        by: ["product_id"],
+      prisma.orderItem.groupBy({
+        by: ["productId"],
         _sum: { quantity: true },
         orderBy: { _sum: { quantity: "desc" } },
         take: 5,
       }),
 
       // Users by role
-      prisma.users.groupBy({
+      prisma.user.groupBy({
         by: ["role"],
         _count: true,
       }),
@@ -59,22 +57,24 @@ export async function GET(req: NextRequest) {
           DATE_TRUNC('month', "created_at") as month,
           SUM("total_amount") as revenue,
           COUNT(*) as orders
-        FROM "order"
+        FROM orders
         WHERE "created_at" > NOW() - INTERVAL '6 months'
         GROUP BY DATE_TRUNC('month', "created_at")
         ORDER BY month DESC
       `,
     ])
 
-    // Fetch product details for top products
-    const productIds = topProductsData.map((item: any) => item.product_id)
+    // Extract productIds safely
+    const productIds = topProductsData
+      .map((item: any) => item.productId) // FIXED: Correct key casing
+      .filter((id: string | undefined): id is string => typeof id === "string")
+
     const products = await prisma.product.findMany({
       where: { id: { in: productIds } },
     })
 
-    // Map product details to topProducts
     const topProducts = topProductsData.map((item: any) => ({
-      product: products.find((p) => p.id === item.product_id),
+      product: products.find((p) => p.id === item.productId),
       totalSold: item._sum.quantity,
     }))
 
@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
         totalUsers,
         totalProducts,
         totalOrders,
-        totalRevenue: totalRevenueData._sum.total_amount || 0,
+        totalRevenue: totalRevenueData._sum.totalAmount || 0,
         recentOrders,
         topProducts,
         usersByRole,

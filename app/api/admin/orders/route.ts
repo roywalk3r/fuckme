@@ -1,8 +1,9 @@
-import type { NextRequest } from "next/server"
+import { NextResponse, type NextRequest } from "next/server"
 import prisma from "@/lib/prisma"
 import { createApiResponse, handleApiError } from "@/lib/api-utils"
 import { adminAuthMiddleware } from "@/lib/admin-auth"
 import { z } from "zod"
+import { auth } from "@clerk/nextjs/server"
 
 // Order update validation schema
 const orderUpdateSchema = z.object({
@@ -13,9 +14,10 @@ const orderUpdateSchema = z.object({
 
 export async function GET(req: NextRequest) {
   // Check admin authorization
-  const authResponse = await adminAuthMiddleware(req)
-  if (authResponse.status !== 200) {
-    return authResponse
+  const { userId } = await auth()
+
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   try {
@@ -61,7 +63,7 @@ export async function GET(req: NextRequest) {
               email: true,
             },
           },
-          order_items: {
+          orderItems: {
             include: {
               product: {
                 select: {
@@ -74,7 +76,7 @@ export async function GET(req: NextRequest) {
           },
           payment: true,
         },
-        orderBy: { created_at: "desc" },
+        orderBy: { createdAt: "desc" },
         skip,
         take: limit,
       }),
@@ -119,7 +121,7 @@ export async function PATCH(req: NextRequest) {
       data: dbData,
       include: {
         user: { select: { id: true, name: true, email: true } },
-        order_items: {
+        orderItems: {
           include: {
             product: { select: { id: true, name: true, images: true } },
           },
@@ -133,5 +135,4 @@ export async function PATCH(req: NextRequest) {
     return handleApiError(error)
   }
 }
-
 

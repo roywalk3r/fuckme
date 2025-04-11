@@ -46,15 +46,15 @@ export async function GET(req: NextRequest) {
 
     // Get users with pagination
     const [users, total] = await Promise.all([
-      prisma.users.findMany({
+      prisma.user.findMany({
         where,
         select: {
           id: true,
           name: true,
           email: true,
           role: true,
-          created_at: true,
-          updated_at: true,
+          createdAt: true,
+          updatedAt: true,
           _count: {
             select: {
               orders: true,
@@ -62,11 +62,11 @@ export async function GET(req: NextRequest) {
             },
           },
         },
-        orderBy: { created_at: "desc" },
+        orderBy: { createdAt: "desc" },
         skip,
         take: limit,
       }),
-      prisma.users.count({ where }),
+      prisma.user.count({ where }),
     ])
 
     return createApiResponse({
@@ -86,7 +86,6 @@ export async function GET(req: NextRequest) {
   }
 }
 
-
 export async function PATCH(req: NextRequest) {
   // Check admin authorization
   const authResponse = await adminAuthMiddleware(req)
@@ -99,10 +98,8 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json()
     const { id, ...data } = userUpdateSchema.parse(body)
 
-    console.log("Updating user:", id, "with data:", data)
-
     // Update user
-    const user = await prisma.users.update({
+    const user = await prisma.user.update({
       where: { id },
       data,
       select: {
@@ -110,8 +107,8 @@ export async function PATCH(req: NextRequest) {
         name: true,
         email: true,
         role: true,
-        created_at: true,
-        updated_at: true,
+        createdAt: true,
+        updatedAt: true,
       },
     })
 
@@ -120,7 +117,6 @@ export async function PATCH(req: NextRequest) {
       status: 200,
     })
   } catch (error) {
-    console.error("Error updating user:", error)
     return handleApiError(error)
   }
 }
@@ -144,7 +140,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Delete user
-    await prisma.users.delete({
+    await prisma.user.delete({
       where: { id },
     })
 
