@@ -156,35 +156,35 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
-export async function DELETE(req: NextRequest) {
-  // Check admin authorization
-  const authResponse = await adminAuthMiddleware(req)
-  if (authResponse.status !== 200) {
-    return authResponse
-  }
+// export async function DELETE(req: NextRequest) {
+//   // Check admin authorization
+//   const authResponse = await adminAuthMiddleware(req)
+//   if (authResponse.status !== 200) {
+//     return authResponse
+//   }
 
-  try {
-    const url = new URL(req.url)
-    const id = url.searchParams.get("id")
+//   try {
+//     const url = new URL(req.url)
+//     const id = url.searchParams.get("id")
 
-    if (!id) {
-      return createApiResponse({
-        error: "Product ID is required",
-        status: 400,
-      })
-    }
+//     if (!id) {
+//       return createApiResponse({
+//         error: "Product ID is required",
+//         status: 400,
+//       })
+//     }
 
-    // Delete product
-    await prisma.product.delete({
-      where: { id },
-    })
+//     // Delete product
+//     await prisma.product.delete({
+//       where: { id },
+//     })
 
-    return createApiResponse({
-      data: { message: "Product deleted successfully" },
-      status: 200,
-    })
-  } catch (error) {
-    return handleApiError(error)
-  }
-}
+//     return createApiResponse({
+//       data: { message: "Product deleted successfully" },
+//       status: 200,
+//     })
+//   } catch (error) {
+//     return handleApiError(error)
+//   }
+// }
 

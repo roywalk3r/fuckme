@@ -9,19 +9,22 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  name      String    @db.VarChar(100)
-  email     String    @unique @db.VarChar(255)
-  role      UserRole  @default(customer)
-  isActive  Boolean   @default(true)
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  addresses Address[]
-  orders    Order[]
-  reviews   Review[]
-  wishlist  Wishlist?
+  id              String           @id @default(cuid())
+  name            String           @db.VarChar(100)
+  email           String           @unique @db.VarChar(255)
+  role            UserRole         @default(customer)
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  deletedAt       DateTime?        @map("deleted_at") // Soft delete field
+  addresses       Address[]
+  orders          Order[]
+  reviews         Review[]
+  wishlist        Wishlist?
+  analyticsEvents AnalyticsEvent[]
 
   @@index([email])
+  @@index([deletedAt])
   @@map("users")
 }
 
@@ -37,6 +40,7 @@ model Product {
   categoryId    String           @map("category_id")
   images        String[]
   isDeleted     Boolean          @default(false) @map("is_deleted")
+  deletedAt     DateTime?        @map("deleted_at") // Soft delete field
   createdAt     DateTime         @default(now()) @map("created_at")
   updatedAt     DateTime         @updatedAt @map("updated_at")
   orderItems    OrderItem[]
@@ -48,22 +52,25 @@ model Product {
   @@index([categoryId])
   @@index([slug])
   @@index([isDeleted])
+  @@index([deletedAt])
   @@map("products")
 }
 
 model ProductVariant {
-  id         String   @id @default(cuid())
-  productId  String   @map("product_id")
-  name       String   @db.VarChar(100)
-  sku        String?  @db.VarChar(50)
-  price      Decimal  @db.Decimal(10, 2)
-  stock      Int      @default(0)
+  id         String    @id @default(cuid())
+  productId  String    @map("product_id")
+  name       String    @db.VarChar(100)
+  sku        String?   @db.VarChar(50)
+  price      Decimal   @db.Decimal(10, 2)
+  stock      Int       @default(0)
   attributes Json // Store color, size, etc.
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-  product    Product  @relation(fields: [productId], references: [id])
+  deletedAt  DateTime? @map("deleted_at") // Soft delete field
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId])
+  @@index([deletedAt])
   @@map("product_variants")
 }
 
@@ -74,13 +81,15 @@ model Category {
   image       String?
   description String?
   parentId    String?    @map("parent_id")
+  deletedAt   DateTime?  @map("deleted_at") // Soft delete field
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")
   products    Product[]
-  parent      Category?  @relation("CategoryToSubcategory", fields: [parentId], references: [id])
+  parent      Category?  @relation("CategoryToSubcategory", fields: [parentId], references: [id], onDelete: SetNull)
   children    Category[] @relation("CategoryToSubcategory")
 
   @@index([slug])
+  @@index([deletedAt])
   @@map("categories")
 }
 
@@ -97,18 +106,20 @@ model Order {
   couponId        String?          @map("coupon_id")
   trackingNumber  String?          @map("tracking_number") @db.VarChar(100)
   notes           String?
+  deletedAt       DateTime?        @map("deleted_at") // Soft delete field
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime         @updatedAt @map("updated_at")
-  user            User             @relation(fields: [userId], references: [id])
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   orderItems      OrderItem[]
   payment         Payment?
   shippingAddress ShippingAddress?
-  coupon          Coupon?          @relation(fields: [couponId], references: [id])
+  coupon          Coupon?          @relation(fields: [couponId], references: [id], onDelete: SetNull)
   refund          Refund?
 
   @@index([userId])
   @@index([status])
   @@index([paymentStatus])
+  @@index([deletedAt])
   @@map("orders")
 }
 
@@ -119,8 +130,8 @@ model OrderItem {
   variantId String? @map("variant_id")
   quantity  Int
   price     Decimal @db.Decimal(10, 2)
-  order     Order   @relation(fields: [orderId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
 
   @@index([orderId])
   @@index([productId])
@@ -137,43 +148,47 @@ model Payment {
   currency      String        @default("USD") @db.VarChar(3)
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
-  order         Order         @relation(fields: [orderId], references: [id])
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([paymentStatus])
   @@map("payments")
 }
 
 model Review {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  productId String   @map("product_id")
-  rating    Int      @db.SmallInt
-  title     String?  @db.VarChar(255)
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  productId String    @map("product_id")
+  rating    Int       @db.SmallInt
+  title     String?   @db.VarChar(255)
   comment   String?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  product   Product  @relation(fields: [productId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  deletedAt DateTime? @map("deleted_at") // Soft delete field
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([productId])
   @@index([userId])
+  @@index([deletedAt])
   @@map("reviews")
 }
 
 model Address {
-  id        String  @id @default(cuid())
-  userId    String  @map("user_id")
-  fullName  String  @map("full_name") @db.VarChar(100)
-  street    String  @db.VarChar(255)
-  city      String  @db.VarChar(100)
-  state     String  @db.VarChar(100)
-  zipCode   String  @map("zip_code") @db.VarChar(20)
-  country   String  @db.VarChar(100)
-  phone     String  @db.VarChar(20)
-  isDefault Boolean @default(false) @map("is_default")
-  user      User    @relation(fields: [userId], references: [id])
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  fullName  String    @map("full_name") @db.VarChar(100)
+  street    String    @db.VarChar(255)
+  city      String    @db.VarChar(100)
+  state     String    @db.VarChar(100)
+  zipCode   String    @map("zip_code") @db.VarChar(20)
+  country   String    @db.VarChar(100)
+  phone     String    @db.VarChar(20)
+  isDefault Boolean   @default(false) @map("is_default")
+  deletedAt DateTime? @map("deleted_at") // Soft delete field
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([deletedAt])
   @@map("addresses")
 }
 
@@ -187,17 +202,19 @@ model ShippingAddress {
   zipCode  String @map("zip_code") @db.VarChar(20)
   country  String @db.VarChar(100)
   phone    String @db.VarChar(20)
-  order    Order  @relation(fields: [orderId], references: [id])
+  order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@map("shipping_addresses")
 }
 
 model Wishlist {
-  id     String         @id @default(cuid())
-  userId String         @unique @map("user_id")
-  user   User           @relation(fields: [userId], references: [id])
-  items  WishlistItem[]
+  id        String         @id @default(cuid())
+  userId    String         @unique @map("user_id")
+  deletedAt DateTime?      @map("deleted_at") // Soft delete field
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     WishlistItem[]
 
+  @@index([deletedAt])
   @@map("wishlists")
 }
 
@@ -206,8 +223,8 @@ model WishlistItem {
   wishlistId String   @map("wishlist_id")
   productId  String   @map("product_id")
   addedAt    DateTime @default(now()) @map("added_at")
-  product    Product  @relation(fields: [productId], references: [id])
-  wishlist   Wishlist @relation(fields: [wishlistId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
 
   @@index([wishlistId])
   @@index([productId])
@@ -236,12 +253,14 @@ model Coupon {
   usageLimit  Int?       @map("usage_limit")
   usageCount  Int        @default(0) @map("usage_count")
   isActive    Boolean    @default(true) @map("is_active")
+  deletedAt   DateTime?  @map("deleted_at") // Soft delete field
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")
   orders      Order[]
 
   @@index([code])
   @@index([isActive])
+  @@index([deletedAt])
   @@map("coupons")
 }
 
@@ -269,10 +288,29 @@ model Refund {
   status    RefundStatus @default(pending)
   createdAt DateTime     @default(now()) @map("created_at")
   updatedAt DateTime     @updatedAt @map("updated_at")
-  order     Order        @relation(fields: [orderId], references: [id])
+  order     Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@map("refunds")
+}
+
+// New model for analytics events
+model AnalyticsEvent {
+  id        String    @id @default(cuid())
+  eventType EventType @map("event_type")
+  userId    String?   @map("user_id")
+  productId String?   @map("product_id")
+  orderId   String?   @map("order_id")
+  metadata  Json?
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([eventType])
+  @@index([userId])
+  @@index([productId])
+  @@index([orderId])
+  @@index([createdAt])
+  @@map("analytics_events")
 }
 
 enum UserRole {
@@ -325,4 +363,19 @@ enum RefundStatus {
   rejected
 
   @@map("refund_status")
+}
+
+enum EventType {
+  PAGE_VIEW
+  PRODUCT_VIEW
+  ADD_TO_CART
+  REMOVE_FROM_CART
+  CHECKOUT_START
+  CHECKOUT_COMPLETE
+  SIGN_IN
+  SIGN_UP
+  SEARCH
+  FILTER
+
+  @@map("event_type")
 }

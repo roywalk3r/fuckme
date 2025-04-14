@@ -108,6 +108,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   try {
     const productId = params.id
     const cacheKey = `product:${productId}`
+    console.log("Deleting product with ID:", productId)
 
     const existingProduct = await prisma.product.findUnique({
       where: { id: productId },

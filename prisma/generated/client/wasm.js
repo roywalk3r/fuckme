@@ -124,7 +124,8 @@ exports.Prisma.UserScalarFieldEnum = {
   role: 'role',
   isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 };
 
 exports.Prisma.ProductScalarFieldEnum = {
@@ -139,6 +140,7 @@ exports.Prisma.ProductScalarFieldEnum = {
   categoryId: 'categoryId',
   images: 'images',
   isDeleted: 'isDeleted',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -151,6 +153,7 @@ exports.Prisma.ProductVariantScalarFieldEnum = {
   price: 'price',
   stock: 'stock',
   attributes: 'attributes',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -162,6 +165,7 @@ exports.Prisma.CategoryScalarFieldEnum = {
   image: 'image',
   description: 'description',
   parentId: 'parentId',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -179,6 +183,7 @@ exports.Prisma.OrderScalarFieldEnum = {
   couponId: 'couponId',
   trackingNumber: 'trackingNumber',
   notes: 'notes',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -211,6 +216,7 @@ exports.Prisma.ReviewScalarFieldEnum = {
   rating: 'rating',
   title: 'title',
   comment: 'comment',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -225,7 +231,8 @@ exports.Prisma.AddressScalarFieldEnum = {
   zipCode: 'zipCode',
   country: 'country',
   phone: 'phone',
-  isDefault: 'isDefault'
+  isDefault: 'isDefault',
+  deletedAt: 'deletedAt'
 };
 
 exports.Prisma.ShippingAddressScalarFieldEnum = {
@@ -242,7 +249,8 @@ exports.Prisma.ShippingAddressScalarFieldEnum = {
 
 exports.Prisma.WishlistScalarFieldEnum = {
   id: 'id',
-  userId: 'userId'
+  userId: 'userId',
+  deletedAt: 'deletedAt'
 };
 
 exports.Prisma.WishlistItemScalarFieldEnum = {
@@ -272,6 +280,7 @@ exports.Prisma.CouponScalarFieldEnum = {
   usageLimit: 'usageLimit',
   usageCount: 'usageCount',
   isActive: 'isActive',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -295,6 +304,16 @@ exports.Prisma.RefundScalarFieldEnum = {
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AnalyticsEventScalarFieldEnum = {
+  id: 'id',
+  eventType: 'eventType',
+  userId: 'userId',
+  productId: 'productId',
+  orderId: 'orderId',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -366,6 +385,19 @@ exports.RefundStatus = exports.$Enums.RefundStatus = {
   rejected: 'rejected'
 };
 
+exports.EventType = exports.$Enums.EventType = {
+  PAGE_VIEW: 'PAGE_VIEW',
+  PRODUCT_VIEW: 'PRODUCT_VIEW',
+  ADD_TO_CART: 'ADD_TO_CART',
+  REMOVE_FROM_CART: 'REMOVE_FROM_CART',
+  CHECKOUT_START: 'CHECKOUT_START',
+  CHECKOUT_COMPLETE: 'CHECKOUT_COMPLETE',
+  SIGN_IN: 'SIGN_IN',
+  SIGN_UP: 'SIGN_UP',
+  SEARCH: 'SEARCH',
+  FILTER: 'FILTER'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Product: 'Product',
@@ -382,7 +414,8 @@ exports.Prisma.ModelName = {
   Settings: 'Settings',
   Coupon: 'Coupon',
   Audit: 'Audit',
-  Refund: 'Refund'
+  Refund: 'Refund',
+  AnalyticsEvent: 'AnalyticsEvent'
 };
 
 /**
