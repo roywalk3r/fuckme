@@ -1,4 +1,3 @@
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:3997233121.
 import type { NextRequest } from "next/server"
 import prisma from "@/lib/prisma"
 import { createApiResponse, handleApiError } from "@/lib/api-utils"
@@ -187,4 +186,3 @@ export async function PATCH(req: NextRequest) {
 //     return handleApiError(error)
 //   }
 // }
-

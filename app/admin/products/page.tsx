@@ -77,25 +77,24 @@ export default function AdminProductsPage() {
     try {
       const response = await fetch(`/api/admin/products/${productToDelete.id}`, {
         method: "DELETE",
-      });
-    
-      const body = await response.json();
-      console.log("Delete API Response:", body);
-    
+      })
+
+      const body = await response.json()
+      console.log("Delete API Response:", body)
+
       if (!response.ok) {
-        throw new Error(body?.error || "Failed to delete product");
+        throw new Error(body?.error || "Failed to delete product")
       }
-    
-      setProducts(products.filter((p) => p.id !== productToDelete.id));
-      toast.success("Product deleted successfully");
-      setProductToDelete(null);
+
+      setProducts(products.filter((p) => p.id !== productToDelete.id))
+      toast.success("Product deleted successfully")
+      setProductToDelete(null)
     } catch (error) {
-      toast.error("Failed to delete product");
-      console.error("Frontend delete error:", error);
+      toast.error("Failed to delete product")
+      console.error("Frontend delete error:", error)
     } finally {
-      setIsDeleting(false);
+      setIsDeleting(false)
     }
-    
   }
 
   const filteredProducts = Array.isArray(products)

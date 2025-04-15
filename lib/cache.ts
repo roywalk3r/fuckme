@@ -109,4 +109,3 @@ export async function fetchWithCache<T>(url: string, options?: RequestInit, ttl?
   const data = await response.json()
   return data
 }
-

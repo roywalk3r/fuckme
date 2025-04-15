@@ -400,7 +400,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/user/tese/prisma/generated/client",
+      "value": "C:\\Users\\ACER\\Desktop\\DEECODE\\NextJs\\TESE\\prisma\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -409,12 +409,12 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "debian-openssl-1.1.x",
+        "value": "windows",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/home/user/tese/prisma/schema.prisma",
+    "sourceFilePath": "C:\\Users\\ACER\\Desktop\\DEECODE\\NextJs\\TESE\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -428,11 +428,12 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgres://avnadmin:AVNS_chTOLegJW4NSLUfnyzI@aerk-comm-projectmail811-9e43.h.aivencloud.com:17636/tese?sslmode=require"
+        "value": null
       }
     }
   },

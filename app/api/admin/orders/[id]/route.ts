@@ -1,7 +1,6 @@
 import type { NextRequest } from "next/server"
 import prisma from "@/lib/prisma"
 import { createApiResponse, handleApiError } from "@/lib/api-utils"
-import { adminAuthMiddleware } from "@/lib/admin-auth"
 import { z } from "zod"
 
 // Validation schema for order status update
@@ -11,11 +10,9 @@ const updateOrderSchema = z.object({
 })
 
 export async function GET(req: NextRequest, context: { params: { id: string } }) {
-
-
   try {
     // const orderId = await params.id
-    const orderId = context.params.id  // Check admin authorization
+    const orderId = context.params.id // Check admin authorization
 
     // Get order with related data
     const order = await prisma.order.findUnique({
@@ -63,7 +60,6 @@ export async function GET(req: NextRequest, context: { params: { id: string } })
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   // Check admin authorization
 
-
   try {
     const orderId = params.id
     const body = await req.json()
@@ -93,7 +89,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
       // Also update payment status if payment exists
       const payment = await prisma.payment.findUnique({
-        where: {  orderId },
+        where: { orderId },
       })
 
       if (payment) {
@@ -118,4 +114,3 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     return handleApiError(error)
   }
 }
-

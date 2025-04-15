@@ -29,36 +29,36 @@ export interface Cart {
   total: number
 }
 
-export interface OrderItem  {
-  id: string;
-  price: number;
-  quantity: number;
+export interface OrderItem {
+  id: string
+  price: number
+  quantity: number
   product: {
-    name: string;
-  };
-};
+    name: string
+  }
+}
 
 export interface ShippingAddress {
-  fullName: string;
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-  phone: string;
-};
+  fullName: string
+  street: string
+  city: string
+  state: string
+  zipCode: string
+  country: string
+  phone: string
+}
 
-export interface Order{
-  id: string;
-  created_at: string;
-  status: string;
-  paymentStatus: string;
-  totalAmount: number;
-  orderItems: OrderItem[];
+export interface Order {
+  id: string
+  created_at: string
+  status: string
+  paymentStatus: string
+  totalAmount: number
+  orderItems: OrderItem[]
   user: {
-    name: string;
-    email: string;
-  };
-  shipping: boolean;
-  shippingAddress: ShippingAddress;
-};
+    name: string
+    email: string
+  }
+  shipping: boolean
+  shippingAddress: ShippingAddress
+}

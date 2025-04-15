@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
           try {
             if (
               setting.key &&
-                 (setting.key === "seo" ||
+              (setting.key === "seo" ||
                 setting.key === "general" ||
                 setting.key === "social" ||
                 setting.key === "email" ||
@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
             status: 400,
           })
       }
-    } catch (validationError:any) {
+    } catch (validationError: any) {
       console.error(`Validation error for ${type} settings:`, validationError)
       return createApiResponse({
         error: `Validation error: ${validationError.message || JSON.stringify(validationError)}`,
@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
         data: settings,
         status: 200,
       })
-    } catch (dbError:any) {
+    } catch (dbError: any) {
       console.error(`Database error when updating ${type} settings:`, dbError)
       return createApiResponse({
         error: `Database error: ${dbError.message || JSON.stringify(dbError)}`,
@@ -174,4 +174,3 @@ export async function POST(req: NextRequest) {
     return handleApiError(error)
   }
 }
-

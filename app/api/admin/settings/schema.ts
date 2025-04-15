@@ -148,4 +148,3 @@ export const defaultSettings: Settings = {
     enableThemeToggle: true,
   },
 }
-

@@ -17,7 +17,7 @@ import {
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useClerk } from "@clerk/nextjs"
-import { ModeToggle } from "@/components/theme-toggle"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function AdminSidebar() {
   const pathname = usePathname()
@@ -87,7 +87,7 @@ export default function AdminSidebar() {
           <Package className="h-6 w-6" />
           <span>Admin Panel</span>
         </Link>
-        <ModeToggle />
+        <ThemeToggle />
       </div>
       <div className="flex-1 px-3 py-2 space-y-1">
         {routes.map((route) => (

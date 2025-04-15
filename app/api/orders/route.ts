@@ -5,7 +5,7 @@ import { adminAuthMiddleware } from "@/lib/admin-auth"
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     // Check admin authentication
-     const authResponse = await adminAuthMiddleware(request)
+    const authResponse = await adminAuthMiddleware(request)
     if (authResponse.status !== 200) {
       return authResponse
     }
@@ -88,7 +88,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     // If payment status is updated, also update the payment record
     if (paymentStatus) {
       await prisma.payment.updateMany({
-        where: {  orderId },
+        where: { orderId },
         data: { paymentStatus },
       })
     }

@@ -15,7 +15,7 @@ export function createApiResponse<T>(response: ApiResponse<T>): NextResponse {
   if (data !== undefined) {
     try {
       serializeData = JSON.parse(
-        JSON.stringify(data, (_, value) => (typeof value === "bigint" ? Number(value) : value))
+        JSON.stringify(data, (_, value) => (typeof value === "bigint" ? Number(value) : value)),
       )
     } catch (err) {
       console.error("Serialization Error:", err)
@@ -25,7 +25,6 @@ export function createApiResponse<T>(response: ApiResponse<T>): NextResponse {
 
   return NextResponse.json({ data: serializeData, error: error || null }, { status })
 }
-
 
 export function handleApiError(error: unknown): NextResponse {
   console.error("API Error:", error)
@@ -88,4 +87,3 @@ export function checkRateLimit(identifier: string, limit: number, windowMs: numb
 
   return false
 }
-

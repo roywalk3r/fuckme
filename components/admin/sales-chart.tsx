@@ -36,10 +36,10 @@ export default function AdminSalesChart() {
         <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
         <Tooltip />
         <CartesianGrid strokeDasharray="3 3" />
-        <Bar yAxisId="left" dataKey="revenue" fill="#8884d8" name="Revenue ($)" />
-        <Bar yAxisId="right" dataKey="orders" fill="#82ca9d" name="Orders" />
+        <Bar yAxisId="left" dataKey="revenue" fill="#2563eb" name="Revenue ($)" />
+        <Bar yAxisId="right" dataKey="orders" fill="#60a5fa" name="Orders" />
       </BarChart>
-    </ResponsiveContainer>
+      </ResponsiveContainer>
   )
 }
 

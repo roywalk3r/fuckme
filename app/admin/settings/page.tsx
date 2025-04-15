@@ -110,7 +110,7 @@ export default function SettingsPage() {
 
         // Clear any previous errors
         setError(null)
-      } catch (e:any) {
+      } catch (e: any) {
         console.error("Error setting form values:", e)
         setError(`Error loading settings: ${e.message || JSON.stringify(e)}`)
       }
@@ -1138,4 +1138,3 @@ export default function SettingsPage() {
     </div>
   )
 }
-

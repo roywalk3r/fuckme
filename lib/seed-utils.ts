@@ -160,4 +160,3 @@ export async function seedDatabase() {
     await prisma.$disconnect()
   }
 }
-

@@ -22,6 +22,16 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AppwriteUpload } from "@/components/appwrite/appwrite-upload"
 import { AppwriteImage } from "@/components/appwrite/appwrite-image"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 // Category validation schema
 const categorySchema = z.object({
@@ -41,6 +51,7 @@ export default function AdminCategoriesPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [categoryToDelete, setCategoryToDelete] = useState<any>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   // Fetch categories
   const { data, isLoading, refetch } = useApi<any>("/api/categories")
@@ -73,20 +84,24 @@ export default function AdminCategoriesPage() {
 
   // Delete category mutation
   const { mutate: deleteCategory, isLoading: isDeletingCategory } = useApiMutation(
-    "/api/categories",
+    `/api/categories?id=${categoryToDelete?.id}`,
     "DELETE",
     {
       onSuccess: () => {
         toast.success("Category deleted successfully")
         refetch()
         setCategoryToDelete(null)
+        setDeleteError(null)
       },
       onError: (error) => {
-        toast.error(`Error deleting category: ${error}`)
+        if (error.includes("associated products")) {
+          setDeleteError("This category has associated products. Please reassign or delete these products first.")
+        } else {
+          toast.error(`Error deleting category: ${error}`)
+        }
       },
-    }
+    },
   )
-  
 
   // Create form
   const createForm = useForm<CategoryFormValues>({
@@ -108,8 +123,6 @@ export default function AdminCategoriesPage() {
       image: "",
     },
   })
-
-  console.log("Categories data:", data)
 
   // Handle create form submission
   const onCreateSubmit = (data: CategoryFormValues) => {
@@ -140,8 +153,10 @@ export default function AdminCategoriesPage() {
   }
 
   // Handle delete category
-  const handleDeleteCategory = (id: string) => {
-    deleteCategory(id)
+  const handleDeleteCategory = () => {
+    if (categoryToDelete?.id) {
+      deleteCategory(categoryToDelete.id)
+    }
   }
 
   // Generate slug from name
@@ -433,22 +448,30 @@ export default function AdminCategoriesPage() {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={!!categoryToDelete} onOpenChange={(open) => !open && setCategoryToDelete(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Category</DialogTitle>
-            <DialogDescription>
+      <AlertDialog open={!!categoryToDelete} onOpenChange={(open) => !open && setCategoryToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Category</AlertDialogTitle>
+            <AlertDialogDescription>
               Are you sure you want to delete "{categoryToDelete?.name}"? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setCategoryToDelete(null)} disabled={isDeletingCategory}>
+              {deleteError && (
+                <div className="mt-2 p-2 bg-destructive/10 text-destructive rounded-md text-sm">{deleteError}</div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                setCategoryToDelete(null)
+                setDeleteError(null)
+              }}
+            >
               Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => handleDeleteCategory(categoryToDelete?.id)}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteCategory}
               disabled={isDeletingCategory}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeletingCategory ? (
                 <>
@@ -458,11 +481,10 @@ export default function AdminCategoriesPage() {
               ) : (
                 "Delete"
               )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
-

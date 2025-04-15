@@ -87,7 +87,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
       categoryId: initialData?.categoryId || "",
       images: initialData?.images || [],
     },
-    mode: "onChange" // Validate on change for better UX
+    mode: "onChange", // Validate on change for better UX
   })
 
   // Debug logging for form values
@@ -134,7 +134,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
 
       // Make sure we're using the correct ID for updates
       const productId = isEditing ? initialData?.id : data.id
-      
+
       if (isEditing && !productId) {
         const errorMessage = "Product ID is missing for update operation"
         console.error(errorMessage)
@@ -149,7 +149,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
       // Include the ID in the request body for clarity
       const requestData = {
         ...data,
-        id: productId
+        id: productId,
       }
 
       console.log(`Sending ${method} request to ${endpoint}:`, requestData)
@@ -170,12 +170,12 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
 
       let responseText
       let responseData
-      
+
       try {
         // First get the raw text to debug any parsing issues
         responseText = await response.text()
         console.log("Raw response:", responseText)
-        
+
         // Try to parse as JSON if possible
         try {
           responseData = JSON.parse(responseText)
@@ -195,7 +195,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
         } else {
           errorMessage = `Error: ${response.status} ${response.statusText}`
         }
-        
+
         throw new Error(errorMessage)
       }
 
@@ -220,28 +220,26 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
   // Handler for manual form submission (bypass react-hook-form)
   const handleManualSubmit = async () => {
     // Check if the form is valid
-    const isValid = await form.trigger();
+    const isValid = await form.trigger()
     if (!isValid) {
-      toast.error("Please correct the form errors before submitting");
-      return;
+      toast.error("Please correct the form errors before submitting")
+      return
     }
 
     // Get current values
-    const formValues = form.getValues();
-    console.log("Manual submit with values:", formValues);
-    
+    const formValues = form.getValues()
+    console.log("Manual submit with values:", formValues)
+
     // Call the regular submit handler
-    await onSubmit(formValues);
-  };
+    await onSubmit(formValues)
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">{isEditing ? "Edit Product" : "Create New Product"}</h1>
         {formStatus && (
-          <div className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
-            Status: {formStatus}
-          </div>
+          <div className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">Status: {formStatus}</div>
         )}
       </div>
 
@@ -255,11 +253,9 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing && (
-                  <div className="text-sm bg-muted p-2 rounded mb-4">
-                    Editing product ID: {initialData?.id}
-                  </div>
+                  <div className="text-sm bg-muted p-2 rounded mb-4">Editing product ID: {initialData?.id}</div>
                 )}
-                
+
                 <FormField
                   control={form.control}
                   name="name"
@@ -296,14 +292,14 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                       <FormItem>
                         <FormLabel>Price ($)</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
-                            step="0.01" 
-                            min="0" 
-                            {...field} 
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            {...field}
                             onChange={(e) => {
-                              const value = e.target.value;
-                              field.onChange(value === "" ? "" : Number(value));
+                              const value = e.target.value
+                              field.onChange(value === "" ? "" : Number(value))
                             }}
                           />
                         </FormControl>
@@ -319,13 +315,13 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                       <FormItem>
                         <FormLabel>Stock</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
-                            min="0" 
-                            {...field} 
+                          <Input
+                            type="number"
+                            min="0"
+                            {...field}
                             onChange={(e) => {
-                              const value = e.target.value;
-                              field.onChange(value === "" ? "" : parseInt(value, 10));
+                              const value = e.target.value
+                              field.onChange(value === "" ? "" : Number.parseInt(value, 10))
                             }}
                           />
                         </FormControl>
@@ -340,11 +336,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Category</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          value={field.value || ""}
-                          disabled={isLoadingCategories}
-                        >
+                        <Select onValueChange={field.onChange} value={field.value || ""} disabled={isLoadingCategories}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a category" />
@@ -410,7 +402,10 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                           {imageUrls.length > 0 ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                               {imageUrls.map((url, index) => (
-                                <div key={`img-${index}-${url.substring(url.lastIndexOf('/') + 1, url.lastIndexOf('/') + 8)}`} className="relative group">
+                                <div
+                                  key={`img-${index}-${url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("/") + 8)}`}
+                                  className="relative group"
+                                >
                                   <div className="aspect-square overflow-hidden rounded-md border">
                                     <AppwriteImage
                                       src={url}
@@ -455,7 +450,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
             <Button type="button" variant="outline" onClick={() => router.push("/admin/products")}>
               Cancel
             </Button>
-            
+
             {/* Regular submit button */}
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
@@ -470,14 +465,9 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                 </>
               )}
             </Button>
-            
+
             {/* Alternative direct submit button for debugging */}
-            <Button 
-              type="button" 
-              onClick={handleManualSubmit} 
-              disabled={isSubmitting}
-              variant="secondary"
-            >
+            <Button type="button" onClick={handleManualSubmit} disabled={isSubmitting} variant="secondary">
               Force Submit
             </Button>
           </div>
@@ -489,8 +479,10 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
               <div className="mt-2 text-xs">
                 <p>Form dirty: {form.formState.isDirty ? "Yes" : "No"}</p>
                 <p>Form valid: {form.formState.isValid ? "Yes" : "No"}</p>
-                <p>Form errors: {Object.keys(form.formState.errors).length > 0 ? 
-                  JSON.stringify(form.formState.errors) : "None"}</p>
+                <p>
+                  Form errors:{" "}
+                  {Object.keys(form.formState.errors).length > 0 ? JSON.stringify(form.formState.errors) : "None"}
+                </p>
                 <p>Is Editing: {isEditing ? "Yes" : "No"}</p>
                 <p>Product ID: {initialData?.id || "Not set"}</p>
               </div>

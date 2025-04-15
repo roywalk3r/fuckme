@@ -107,4 +107,3 @@ export async function updateSettings<T extends keyof Settings>(type: T, data: Se
     return false
   }
 }
-

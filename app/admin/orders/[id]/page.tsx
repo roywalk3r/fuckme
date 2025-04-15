@@ -10,11 +10,11 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
-import type {Order} from "@/types/product"
+import type { Order } from "@/types/product"
 export default function OrderDetailsPage() {
   const { id } = useParams()
   const router = useRouter()
-  const [order, setOrder] = useState<Order | null>(null);
+  const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
   const [status, setStatus] = useState("")
@@ -25,19 +25,19 @@ export default function OrderDetailsPage() {
       try {
         const response = await fetch(`/api/admin/orders/${id}`)
         const data = await response.json()
-          console.log(data.data)
+        console.log(data.data)
         if (data.data) {
           setOrder(data.data)
           setStatus(data.data.status)
           setPaymentStatus(data.data.paymentStatus)
         } else {
-          toast.error( "Error",{
+          toast.error("Error", {
             description: "Failed to load order details",
           })
         }
       } catch (error) {
         console.error("Error fetching order:", error)
-        toast.error("Error",{
+        toast.error("Error", {
           description: "Failed to load order details",
         })
       } finally {
@@ -66,27 +66,25 @@ export default function OrderDetailsPage() {
 
       const data = await response.json()
       if (data.success) {
-        toast.success("Success",{
+        toast.success("Success", {
           description: "Order status updated successfully",
         })
         // Update the local order state with the new status
-        setOrder(prev => ({
+        setOrder((prev) => ({
           ...(prev as Order),
-          status: 'confirmed',
-          paymentStatus: 'paid',
-        }));
-        
-
-      } else  {
-        toast.error( "Error",{
+          status: "confirmed",
+          paymentStatus: "paid",
+        }))
+      } else {
+        toast.error("Error", {
           description: data.message || "Failed to update order status",
         })
       }
     } catch (error) {
       console.error("Error updating order status:", error)
-      toast.error( "Error",{
+      toast.error("Error", {
         description: "Failed to update order status",
-           })
+      })
     } finally {
       setUpdating(false)
     }

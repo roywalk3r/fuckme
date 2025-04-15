@@ -18,20 +18,19 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body suppressHydrationWarning>
+        <body>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <ClerkProvider>
             <div className="flex min-h-screen flex-col">
               <Header />
               <main className="flex-1">{children}</main>
               <Footer />
             </div>
             <Toaster />
+      </ClerkProvider>
           </ThemeProvider>
         </body>
       </html>
-    </ClerkProvider>
   )
 }
-

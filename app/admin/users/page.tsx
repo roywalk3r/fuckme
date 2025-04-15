@@ -99,7 +99,7 @@ export default function AdminUsersPage() {
 
   const users = data?.users || []
   const pagination = data?.pagination || { total: 0, pages: 1 }
-console.log(data)
+  console.log(data)
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

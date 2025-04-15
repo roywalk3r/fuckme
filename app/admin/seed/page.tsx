@@ -21,14 +21,14 @@ export default function AdminSeedPage() {
     isSuccess,
   } = useApiMutation("/api/admin/seed", "POST", {
     onSuccess: () => {
-      toast.error( "Database seeded successfully",{
+      toast.error("Database seeded successfully", {
         description: "Sample data has been added to your database.",
       })
     },
     onError: (error) => {
-      toast.error( "Error seeding database",{
-        description: error 
-          })
+      toast.error("Error seeding database", {
+        description: error,
+      })
     },
   })
 
@@ -103,4 +103,3 @@ export default function AdminSeedPage() {
     </div>
   )
 }
-

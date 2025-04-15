@@ -42,4 +42,3 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     return NextResponse.json({ error: "Failed to update user" }, { status: 500 })
   }
 }
-

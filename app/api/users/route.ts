@@ -21,4 +21,3 @@ export async function POST(req: Request) {
 
   return NextResponse.json(user, { status: 201 })
 }
-

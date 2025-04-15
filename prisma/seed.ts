@@ -279,8 +279,8 @@ async function main() {
     data: {
       userId: regularUser.id,
       subtotal: 209.98,
-      tax: 20.00,
-      shipping: 0.00,
+      tax: 20.0,
+      shipping: 0.0,
       totalAmount: 229.98,
       status: "pending",
       paymentStatus: "paid",
@@ -319,7 +319,7 @@ async function main() {
   await prisma.payment.create({
     data: {
       orderId: order.id,
-      amount:order.totalAmount,
+      amount: order.totalAmount,
       currency: "usd",
       paymentMethod: "stripe",
       paymentStatus: "paid",
@@ -333,7 +333,7 @@ async function main() {
       userId: regularUser.id,
       subtotal: 249.97,
       tax: 0.02,
-      shipping: 0.00,
+      shipping: 0.0,
       totalAmount: 249.99,
       status: "shipped",
       paymentStatus: "paid",
@@ -391,4 +391,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect()
   })
-
