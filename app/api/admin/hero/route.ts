@@ -1,121 +1,78 @@
-
-
-import type { NextRequest } from "next/server"
 import prisma from "@/lib/prisma"
 import { createApiResponse, handleApiError } from "@/lib/api-utils"
-import { adminAuthMiddleware } from "@/lib/admin-auth"
+import { z } from "zod"
 
-export async function GET(req: NextRequest) {
- // Check admin authorization
- const authResponse = await adminAuthMiddleware(req)
- if (authResponse.status !== 200) {
-   return authResponse
- }
+// Hero validation schema
+const heroSchema = z.object({
+    id: z.string().optional(),
+    title: z.string().min(2, "Title must be at least 2 characters"),
+    description: z.string().optional(),
+    buttonText: z.string().optional(),
+    buttonLink: z.string().optional(),
+    image: z.string().url("Invalid image URL").optional(),
+    color: z.string().optional(),
+    isActive: z.boolean().default(true),
+})
 
- try {
-   const hero = await prisma.hero.findMany()
-
-   return createApiResponse({
-     data: hero,
-     status: 200,
-   })
- } catch (error) {
-   return handleApiError(error)
- }
+export async function GET() {
+    try {
+        const hero = await prisma.hero.findMany()
+        return createApiResponse({ data: hero, status: 200 })
+    } catch (error) {
+        return handleApiError(error)
+    }
 }
 
-export async function POST(req: NextRequest) {
- // Check admin authorization
- const authResponse = await adminAuthMiddleware(req)
- if (authResponse.status !== 200) {
-   return authResponse
- }
+export async function POST(req: Request) {
+    try {
+        const body = await req.json()
+        const validatedData = heroSchema.parse(body)
 
- try {
-   const body = await req.json()
+        const hero = await prisma.hero.create({
+            data: validatedData,
+        })
 
-   const hero = await prisma.hero.create({
-     data: {
-       title: body.title,
-       description: body.description,
-       image: body.image,
-       buttonText: body.buttonText,
-       buttonLink: body.buttonLink,
-       color: body.color,
-     },
-   })
-
-   return createApiResponse({
-     data: hero,
-     status: 201,
-   })
- } catch (error) {
-   return handleApiError(error)
- }
+        return createApiResponse({ data: hero, status: 201 })
+    } catch (error) {
+        return handleApiError(error)
+    }
 }
 
-export async function PATCH(req: NextRequest) {
- // Check admin authorization
- const authResponse = await adminAuthMiddleware(req)
- if (authResponse.status !== 200) {
-   return authResponse
- }
+export async function PATCH(req: Request) {
+    try {
+        const body = await req.json()
+        const { id, ...validatedData } = heroSchema.parse(body)
 
- try {
-   const body = await req.json()
+        if (!id) {
+            return createApiResponse({ error: "Hero ID is required", status: 400 })
+        }
 
-   const hero = await prisma.hero.update({
-     where: {
-       id: Number(body.id),
-     },
-     data: {
-       title: body.title,
-       description: body.description,
-       image: body.image,
-       buttonText: body.buttonText,
-       buttonLink: body.buttonLink,
-       color: body.color,
-     },
-   })
+        const hero = await prisma.hero.update({
+            where: { id },
+            data: validatedData,
+        })
 
-   return createApiResponse({
-     data: hero,
-     status: 200,
-   })
- } catch (error) {
-   return handleApiError(error)
- }
+        return createApiResponse({ data: hero, status: 200 })
+    } catch (error) {
+        return handleApiError(error)
+    }
 }
 
-export async function DELETE(req: NextRequest) {
- // Check admin authorization
- const authResponse = await adminAuthMiddleware(req)
- if (authResponse.status !== 200) {
-   return authResponse
- }
+export async function DELETE(req: Request) {
+    try {
+        const url = new URL(req.url)
+        const id = url.searchParams.get("id")
 
- try {
-   const url = new URL(req.url)
-   const id = url.searchParams.get("id")
+        if (!id) {
+            return createApiResponse({ error: "Hero ID is required", status: 400 })
+        }
 
-   if (!id) {
-     return createApiResponse({
-       error: "Hero Content ID is required",
-       status: 400,
-     })
-   }
+        await prisma.hero.delete({
+            where: { id },
+        })
 
-   await prisma.hero.delete({
-     where: {
-       id: Number(id),
-     },
-   })
-
-   return createApiResponse({
-     data: { message: "Hero Content deleted successfully" },
-     status: 200,
-   })
- } catch (error) {
-   return handleApiError(error)
- }
+        return createApiResponse({  status: 200 })
+    } catch (error) {
+        return handleApiError(error)
+    }
 }

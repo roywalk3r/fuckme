@@ -9,10 +9,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 export function FeaturedCategories() {
   const { data, isLoading } = useApi<any>("/api/categories")
   const [categories, setCategories] = useState<any[]>([])
-
+console.log(data, "Carteg")
   useEffect(() => {
     if (data) {
-      setCategories(data.slice(0, 4))
+      setCategories(data.data.slice(0, 4))
     }
   }, [data])
 

@@ -1,281 +1,352 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
-import { Loader2, Plus, Edit, Trash2 } from 'lucide-react'
-import { useApi, useApiMutation } from "@/lib/hooks/use-api"
+import { toast } from "sonner"
+import { Loader2, Save, Trash2 } from "lucide-react"
+import { AppwriteUpload } from "@/components/appwrite/appwrite-upload"
+import { AppwriteImage } from "@/components/appwrite/appwrite-image"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { AppwriteMediaBrowser } from "@/components/appwrite/appwrite-media-browser"
 
-export default function HeroContentPage() {
-    const { toast } = useToast()
-    const [heroContent, setHeroContent] = useState([])
-    const [isCreating, setIsCreating] = useState(false)
-    const [isEditing, setIsEditing] = useState(false)
-    const [selectedHeroContent, setSelectedHeroContent] = useState(null)
+// Hero validation schema
+const heroSchema = z.object({
+    id: z.string().optional(),
+    title: z.string().min(2, "Title must be at least 2 characters"),
+    description: z.string().optional(),
+    buttonText: z.string().optional(),
+    buttonLink: z.string().optional(),
+    image: z.string().url("Invalid image URL").optional(),
+    color: z.string().optional(),
+    isActive: z.boolean().default(true),
+})
 
-    const { data, isLoading, refetch } = useApi<any>("/api/admin/hero")
+type HeroFormValues = z.infer<typeof heroSchema>
 
-    const { mutate: createHeroContent, isLoading: isCreatingHeroContent } = useApiMutation(
-        "/api/admin/hero",
-        "POST",
-        {
-            onSuccess: () => {
-                toast({
-                    title: "Hero Content Created",
-                    description: "New hero content has been successfully created.",
-                })
-                refetch()
-                setIsCreating(false)
-            },
-            onError: (error) => {
-                toast({
-                    title: "Error",
-                    description: `Failed to create hero content: ${error}`,
-                    variant: "destructive",
-                })
-            },
+export default function AdminHeroPage() {
+    const [heroContent, setHeroContent] = useState<HeroFormValues[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+    const [isSaving, setIsSaving] = useState(false)
+    const [selectedHero, setSelectedHero] = useState<HeroFormValues | null>(null)
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
+    const form = useForm<HeroFormValues>({
+        resolver: zodResolver(heroSchema),
+        defaultValues: {
+            title: "",
+            description: "",
+            buttonText: "",
+            buttonLink: "",
+            image: "",
+            color: "",
+            isActive: true,
         },
-    )
-
-    const { mutate: updateHeroContent, isLoading: isUpdatingHeroContent } = useApiMutation(
-        "/api/admin/hero",
-        "PATCH",
-        {
-            onSuccess: () => {
-                toast({
-                    title: "Hero Content Updated",
-                    description: "Hero content has been successfully updated.",
-                })
-                refetch()
-                setIsEditing(false)
-            },
-            onError: (error) => {
-                toast({
-                    title: "Error",
-                    description: `Failed to update hero content: ${error}`,
-                    variant: "destructive",
-                })
-            },
-        },
-    )
-
-    const { mutate: deleteHeroContent, isLoading: isDeletingHeroContent } = useApiMutation(
-        `/api/admin/hero-content`,
-        "DELETE",
-        {
-            onSuccess: () => {
-                toast({
-                    title: "Hero Content Deleted",
-                    description: "Hero content has been successfully deleted.",
-                })
-                refetch()
-            },
-            onError: (error) => {
-                toast({
-                    title: "Error",
-                    description: `Failed to delete hero content: ${error}`,
-                    variant: "destructive",
-                })
-            },
-        },
-    )
+    })
 
     useEffect(() => {
-        if (data?.data) {
-            setHeroContent(data.data)
+        const fetchHeroContent = async () => {
+            try {
+                setIsLoading(true)
+                const response = await fetch("/api/admin/hero")
+                if (response.ok) {
+                    const data = await response.json()
+                    setHeroContent(data.data || [])
+                } else {
+                    console.error("Failed to fetch hero content")
+                }
+            } catch (error) {
+                console.error("Error fetching hero content:", error)
+                toast.error("Failed to fetch hero content")
+            } finally {
+                setIsLoading(false)
+            }
         }
-    }, [data])
+
+        fetchHeroContent()
+    }, [])
+
+    const handleImageUpload = (urls: string[]) => {
+        if (urls.length > 0) {
+            form.setValue("image", urls[0])
+        }
+    }
+
+    const handleMediaSelection = (urls: string[]) => {
+        if (urls.length > 0) {
+            form.setValue("image", urls[0])
+        }
+    }
+
+    const onSubmit = async (data: HeroFormValues) => {
+        setIsSaving(true)
+        try {
+            const response = await fetch("/api/admin/hero", {
+                method: selectedHero ? "PATCH" : "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(selectedHero ? { ...data, id: selectedHero.id } : data),
+            })
+
+            if (response.ok) {
+                toast.success(`Hero content ${selectedHero ? "updated" : "created"} successfully`)
+                setHeroContent((prev) =>
+                    selectedHero
+                        ? prev.map((item) => (item.id === selectedHero.id ? { ...item, ...data } : item))
+                        : [...prev, { ...data, id: Math.random().toString() }],
+                )
+                form.reset()
+                setSelectedHero(null)
+            } else {
+                toast.error("Failed to save hero content")
+            }
+        } catch (error) {
+            console.error("Error saving hero content:", error)
+            toast.error("Error saving hero content")
+        } finally {
+            setIsSaving(false)
+        }
+    }
+
+    const handleDelete = async () => {
+        setIsSaving(true)
+        try {
+            const response = await fetch(`/api/admin/hero?id=${selectedHero?.id}`, {
+                method: "DELETE",
+            })
+
+            if (response.ok) {
+                toast.success("Hero content deleted successfully")
+                setHeroContent((prev) => prev.filter((item) => item.id !== selectedHero?.id))
+                form.reset()
+                setSelectedHero(null)
+            } else {
+                toast.error("Failed to delete hero content")
+            }
+        } catch (error) {
+            console.error("Error deleting hero content:", error)
+            toast.error("Error deleting hero content")
+        } finally {
+            setIsSaving(false)
+            setIsDeleteDialogOpen(false)
+        }
+    }
 
     return (
         <div className="container py-10">
-            <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-bold">Hero Content Management</h1>
-                <Button onClick={() => setIsCreating(true)}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add New
+            <div className="flex items-center justify-between">
+                <h1 className="text-3xl font-bold tracking-tight">Manage Hero Section</h1>
+                <Button
+                    onClick={() => {
+                        form.reset()
+                        setSelectedHero(null)
+                    }}
+                >
+                    Add Hero
                 </Button>
             </div>
 
-            {isLoading ? (
-                <div className="flex items-center justify-center min-h-[400px]">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {heroContent.map((item:any) => (
-                        <Card key={item.id}>
-                            <CardHeader>
-                                <CardTitle>{item.title}</CardTitle>
-                                <CardDescription>{item.description}</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <img src={item.image || "/placeholder.svg"} alt={item.title} className="w-full h-48 object-cover rounded-md" />
-                            </CardContent>
-                            <CardFooter className="flex justify-between">
-                                <Button variant="outline" size="sm" onClick={() => handleEdit(item)}>
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    Edit
-                                </Button>
-                                <Button variant="destructive" size="sm" onClick={() => handleDelete(item.id)}>
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    Delete
-                                </Button>
-                            </CardFooter>
-                        </Card>
-                    ))}
-                </div>
-            )}
+            <div className="grid gap-6 md:grid-cols-2">
+                {/* Hero List */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Hero Entries</CardTitle>
+                        <CardDescription>View and manage your hero entries.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {isLoading ? (
+                            <div className="flex items-center justify-center min-h-[200px]">
+                                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                            </div>
+                        ) : heroContent.length === 0 ? (
+                            <div className="text-center py-8">No hero entries found.</div>
+                        ) : (
+                            <div className="space-y-2">
+                                {heroContent.map((hero) => (
+                                    <Button
+                                        key={hero.id}
+                                        variant="ghost"
+                                        className="w-full justify-start"
+                                        onClick={() => setSelectedHero(hero)}
+                                    >
+                                        {hero.title}
+                                    </Button>
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
 
-            {/* Create Modal */}
-            {isCreating && (
-                <CreateHeroContentModal
-                    open={isCreating}
-                    onClose={() => setIsCreating(false)}
-                    onSubmit={createHeroContent}
-                    isLoading={isCreatingHeroContent}
-                />
-            )}
-
-            {/* Edit Modal */}
-            {isEditing && (
-                <EditHeroContentModal
-                    open={isEditing}
-                    onClose={() => setIsEditing(false)}
-                    onSubmit={updateHeroContent}
-                    isLoading={isUpdatingHeroContent}
-                    initialData={selectedHeroContent}
-                />
-            )}
-        </div>
-    )
-
-    function handleEdit(item: any) {
-        setSelectedHeroContent(item)
-        setIsEditing(true)
-    }
-
-    function handleDelete(id: any) {
-        deleteHeroContent(id)
-    }
-}
-
-function CreateHeroContentModal({ open, onClose, onSubmit, isLoading }:any) {
-    const [title, setTitle] = useState("")
-    const [description, setDescription] = useState("")
-    const [image, setImage] = useState("")
-    const [buttonText, setButtonText] = useState("")
-    const [buttonLink, setButtonLink] = useState("")
-    const [color, setColor] = useState("")
-
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        await onSubmit({ title, description, image, buttonText, buttonLink, color })
-        onClose()
-    }
-
-    return (
-        <div className={`fixed inset-0 z-50 ${open ? "" : "hidden"}`}>
-            <div className="fixed inset-0 bg-black/50" onClick={onClose}></div>
-            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-2xl font-bold mb-4">Create Hero Content</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <Label htmlFor="title">Title</Label>
-                        <Input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-                    </div>
-                    <div>
-                        <Label htmlFor="description">Description</Label>
-                        <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
-                    </div>
-                    <div>
-                        <Label htmlFor="image">Image URL</Label>
-                        <Input type="url" id="image" value={image} onChange={(e) => setImage(e.target.value)} />
-                    </div>
-                    <div>
-                        <Label htmlFor="buttonText">Button Text</Label>
-                        <Input type="text" id="buttonText" value={buttonText} onChange={(e) => setButtonText(e.target.value)} />
-                    </div>
-                    <div>
-                        <Label htmlFor="buttonLink">Button Link</Label>
-                        <Input type="url" id="buttonLink" value={buttonLink} onChange={(e) => setButtonLink(e.target.value)} />
-                    </div>
-                    <div>
-                        <Label htmlFor="color">Color</Label>
-                        <Input type="text" id="color" value={color} onChange={(e) => setColor(e.target.value)} />
-                    </div>
-                    <div className="flex justify-end">
-                        <Button type="button" variant="outline" onClick={onClose}>
-                            Cancel
-                        </Button>
-                        <Button type="submit" disabled={isLoading}>
-                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Create"}
-                        </Button>
-                    </div>
-                </form>
+                {/* Hero Form */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{selectedHero ? "Edit Hero" : "Add Hero"}</CardTitle>
+                        <CardDescription>
+                            {selectedHero ? "Edit the details of the selected hero." : "Create a new hero entry."}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                <FormField
+                                    control={form.control}
+                                    name="title"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Title</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter title" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
+                                            <FormControl>
+                                                <Textarea placeholder="Enter description" className="min-h-[80px]" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="buttonText"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Button Text</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter button text" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="buttonLink"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Button Link</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter button link" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="image"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Image</FormLabel>
+                                            <FormControl>
+                                                <div className="space-y-2">
+                                                    <AppwriteUpload
+                                                        onUploadSuccess={(urls) => handleImageUpload(urls)}
+                                                        buttonText="Upload Image"
+                                                        multiple={false}
+                                                    />
+                                                    <AppwriteMediaBrowser
+                                                        onSelect={(urls) => handleImageUpload(urls)}
+                                                        buttonText="Select from Media Library"
+                                                        multiple={false}
+                                                    />
+                                                    {field.value && (
+                                                        <div className="mt-2">
+                                                            <AppwriteImage
+                                                                src={field.value}
+                                                                alt="Hero image"
+                                                                width={200}
+                                                                height={200}
+                                                                className="rounded-md"
+                                                            />
+                                                        </div>
+                                                    )}
+                                                    <Input type="hidden" {...field} />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <div className="flex justify-end gap-2">
+                                    {selectedHero && (
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            onClick={() => setIsDeleteDialogOpen(true)}
+                                            disabled={isSaving}
+                                        >
+                                            <Trash2 className="mr-2 h-4 w-4" />
+                                            Delete
+                                        </Button>
+                                    )}
+                                    <Button type="submit" disabled={isSaving}>
+                                        {isSaving ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Save className="mr-2 h-4 w-4" />
+                                                Save
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
+                            </form>
+                        </Form>
+                    </CardContent>
+                </Card>
             </div>
-        </div>
-    )
-}
 
-function EditHeroContentModal({ open, onClose, onSubmit, isLoading, initialData }:any) {
-    const [title, setTitle] = useState(initialData?.title || "")
-    const [description, setDescription] = useState(initialData?.description || "")
-    const [image, setImage] = useState(initialData?.image || "")
-    const [buttonText, setButtonText] = useState(initialData?.buttonText || "")
-    const [buttonLink, setButtonLink] = useState(initialData?.buttonLink || "")
-    const [color, setColor] = useState(initialData?.color || "")
-
-    const handleSubmit = async (e: { preventDefault: () => void }) => {
-        e.preventDefault()
-        await onSubmit({ id: initialData.id, title, description, image, buttonText, buttonLink, color })
-        onClose()
-    }
-
-    return (
-        <div className={`fixed inset-0 z-50 ${open ? "" : "hidden"}`}>
-            <div className="fixed inset-0 bg-black/50" onClick={onClose}></div>
-            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-2xl font-bold mb-4">Edit Hero Content</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <Label htmlFor="title">Title</Label>
-                        <Input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-                    </div>
-                    <div>
-                        <Label htmlFor="description">Description</Label>
-                        <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
-                    </div>
-                    <div>
-                        <Label htmlFor="image">Image URL</Label>
-                        <Input type="url" id="image" value={image} onChange={(e) => setImage(e.target.value)} />
-                    </div>
-                    <div>
-                        <Label htmlFor="buttonText">Button Text</Label>
-                        <Input type="text" id="buttonText" value={buttonText} onChange={(e) => setButtonText(e.target.value)} />
-                    </div>
-                    <div>
-                        <Label htmlFor="buttonLink">Button Link</Label>
-                        <Input type="url" id="buttonLink" value={buttonLink} onChange={(e) => setButtonLink(e.target.value)} />
-                    </div>
-                    <div>
-                        <Label htmlFor="color">Color</Label>
-                        <Input type="text" id="color" value={color} onChange={(e) => setColor(e.target.value)} />
-                    </div>
-                    <div className="flex justify-end">
-                        <Button type="button" variant="outline" onClick={onClose}>
-                            Cancel
-                        </Button>
-                        <Button type="submit" disabled={isLoading}>
-                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update"}
-                        </Button>
-                    </div>
-                </form>
-            </div>
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Hero</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete this hero entry? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} disabled={isSaving}>
+                            {isSaving ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Deleting...
+                                </>
+                            ) : (
+                                "Delete"
+                            )}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }

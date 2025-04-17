@@ -13,7 +13,20 @@ const nextConfig = {
       },
     ],
   },
-  // Keep any other existing configuration
+  async headers() {
+    return [
+      {
+        // Apply to all routes
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'ngrok-skip-browser-warning',
+            value: 'true',
+          },
+        ],
+      },
+    ];
+  },
 }
 
 export default nextConfig

@@ -136,8 +136,6 @@ export default function Header() {
               <SignedOut>
                 <Button variant="ghost" size="sm" asChild>
                   <SignInButton mode="modal">
-                    <User className="h-5 w-5 mr-2" />
-                    Sign In
                   </SignInButton>
                 </Button>
               </SignedOut>
